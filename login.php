@@ -20,6 +20,7 @@ if (isPostRequest()) {
     $result = loginUser($pdo, $oldIdentifier, $password);
     if ($result['success']) {
         setFlash('success', 'Login realizado com sucesso.');
+        $_SESSION['dashboard_transition'] = true;
         redirect('dashboard.php');
     }
 

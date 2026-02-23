@@ -10,6 +10,9 @@ $pdo = getPDO();
 $userId = currentUserId();
 $flash = getFlash();
 
+$slideIn = !empty($_SESSION['dashboard_transition']);
+unset($_SESSION['dashboard_transition']);
+
 $stmt = $pdo->prepare(
     'SELECT id, title, slug, created_at, updated_at
      FROM posts
@@ -27,7 +30,7 @@ $posts = $stmt->fetchAll();
     <title>Dashboard</title>
     <link rel="stylesheet" href="public/css/style.css">
 </head>
-<body>
+<body<?= $slideIn ? ' class="dashboard-slide-in"' : ''; ?>>
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
