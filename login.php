@@ -20,8 +20,8 @@ if (isPostRequest()) {
     $result = loginUser($pdo, $oldIdentifier, $password);
     if ($result['success']) {
         setFlash('success', 'Login realizado com sucesso.');
-        $_SESSION['dashboard_transition'] = true;
-        redirect('dashboard.php');
+        $_SESSION['dashboard_transition'] = 'slide_in_right';
+        redirect('dashboard.php?entered=1');
     }
 
     $errors = $result['errors'];
@@ -34,6 +34,7 @@ if (isPostRequest()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
     <header class="site-header">

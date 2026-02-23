@@ -20,6 +20,7 @@ $posts = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog PHP</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
     <header class="site-header">
