@@ -1,8 +1,1 @@
-# Credenciais do banco
 config/database.php
-
-# Pasta do PHP Server (se gerar alguma)
-.phpserver
-
-# Arquivos do VSCode
-.vscode/
