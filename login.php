@@ -20,6 +20,7 @@ if (isPostRequest()) {
     $result = loginUser($pdo, $oldIdentifier, $password);
     if ($result['success']) {
         setFlash('success', 'Login realizado com sucesso.');
+        $_SESSION['dashboard_transition'] = 'slide_in_right';
         redirect('dashboard.php');
     }
 
@@ -45,9 +46,10 @@ if (isPostRequest()) {
         </div>
     </header>
 
-    <main class="container">
-        <section class="card form-card">
+    <main class="container page-shell">
+        <section class="card form-card auth-card">
             <h1>Entrar</h1>
+            <p class="meta form-intro">Acesse sua conta para gerenciar seus posts.</p>
 
             <?php if ($flash): ?>
                 <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
@@ -73,7 +75,7 @@ if (isPostRequest()) {
                 <button type="submit">Login</button>
             </form>
 
-            <p>Ainda não tem conta? <a href="register.php">Cadastre-se</a>.</p>
+            <p class="meta">Ainda não tem conta? <a href="register.php">Cadastre-se</a>.</p>
         </section>
     </main>
 </body>

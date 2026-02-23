@@ -48,9 +48,10 @@ if (isPostRequest()) {
         </div>
     </header>
 
-    <main class="container">
-        <section class="card form-card">
+    <main class="container page-shell">
+        <section class="card form-card auth-card">
             <h1>Criar conta</h1>
+            <p class="meta form-intro">Cadastre-se para começar a publicar seus conteúdos.</p>
 
             <?php if ($errors !== []): ?>
                 <div class="alert alert-error">
@@ -73,7 +74,7 @@ if (isPostRequest()) {
                 <button type="submit">Cadastrar</button>
             </form>
 
-            <p>Já tem conta? <a href="login.php">Faça login</a>.</p>
+            <p class="meta">Já tem conta? <a href="login.php">Faça login</a>.</p>
         </section>
     </main>
 </body>

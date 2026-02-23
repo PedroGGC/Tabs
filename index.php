@@ -37,14 +37,22 @@ $posts = $stmt->fetchAll();
         </div>
     </header>
 
-    <main class="container">
-        <h1>Posts recentes</h1>
+    <main class="container page-shell">
+        <section class="card hero">
+            <div>
+                <h1>Posts recentes</h1>
+                <p class="hero-subtitle">Leituras rápidas, ideias e atualizações publicadas pelos autores da plataforma.</p>
+            </div>
+            <?php if (isLogged()): ?>
+                <a class="button-inline" href="post-create.php">Criar</a>
+            <?php endif; ?>
+        </section>
 
         <?php if ($posts === []): ?>
             <p class="empty">Nenhum post publicado ainda.</p>
         <?php else: ?>
             <?php foreach ($posts as $post): ?>
-                <article class="card">
+                <article class="card post-card">
                     <h2>
                         <a href="post.php?id=<?= (int) $post['id']; ?>"><?= e($post['title']); ?></a>
                     </h2>
@@ -52,7 +60,7 @@ $posts = $stmt->fetchAll();
                         Por <strong><?= e($post['author']); ?></strong> em <?= e(formatDate($post['created_at'])); ?>
                     </p>
                     <p><?= e(excerpt($post['content'])); ?></p>
-                    <a class="read-more" href="post.php?id=<?= (int) $post['id']; ?>">Ler post completo</a>
+                    <a class="read-more" href="post.php?id=<?= (int) $post['id']; ?>">Continuar leitura</a>
                 </article>
             <?php endforeach; ?>
         <?php endif; ?>
