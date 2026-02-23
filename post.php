@@ -31,6 +31,7 @@ if (!$post) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $post ? e($post['title']) : 'Post não encontrado'; ?></title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -48,12 +49,12 @@ if (!$post) {
         </div>
     </header>
 
-    <main class="container">
+    <main class="container page-shell">
         <?php if (!$post): ?>
             <article class="card">
                 <h1>Post não encontrado</h1>
                 <p>O post solicitado não existe ou foi removido.</p>
-                <a href="index.php">Voltar para a listagem</a>
+                <a class="read-more" href="index.php">Voltar para a listagem</a>
             </article>
         <?php else: ?>
             <article class="card post-full">
@@ -63,7 +64,7 @@ if (!$post) {
                 </p>
                 <div class="post-content"><?= nl2br(e($post['content'])); ?></div>
                 <p class="meta">Última atualização: <?= e(formatDate($post['updated_at'])); ?></p>
-                <a href="index.php">Voltar para a listagem</a>
+                <a class="read-more" href="index.php">Voltar para a listagem</a>
             </article>
         <?php endif; ?>
     </main>

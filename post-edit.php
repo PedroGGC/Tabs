@@ -73,6 +73,7 @@ if (isPostRequest()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar post</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -80,15 +81,16 @@ if (isPostRequest()) {
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="post-create.php">Novo post</a>
+                <a href="post-create.php">Criar</a>
                 <a href="logout.php">Sair</a>
             </nav>
         </div>
     </header>
 
-    <main class="container">
+    <main class="container page-shell">
         <section class="card form-card">
             <h1>Editar post</h1>
+            <p class="meta form-intro">Ajuste seu conteúdo e salve as alterações.</p>
 
             <?php if ($errors !== []): ?>
                 <div class="alert alert-error">

@@ -9,12 +9,19 @@ requireLogin();
 $pdo = getPDO();
 $userId = currentUserId();
 $flash = getFlash();
+$dashboardTransitionClass = '';
+$enteredFromLogin = isset($_GET['entered']) && $_GET['entered'] === '1';
 
-$slideIn = !empty($_SESSION['dashboard_transition']);
-unset($_SESSION['dashboard_transition']);
+if (
+    $enteredFromLogin ||
+    (isset($_SESSION['dashboard_transition']) && $_SESSION['dashboard_transition'] === 'slide_in_right')
+) {
+    $dashboardTransitionClass = 'dashboard-slide-in';
+    unset($_SESSION['dashboard_transition']);
+}
 
 $stmt = $pdo->prepare(
-    'SELECT id, title, slug, created_at, updated_at
+    'SELECT id, title, created_at, updated_at
      FROM posts
      WHERE user_id = :user_id
      ORDER BY created_at DESC'
@@ -29,23 +36,25 @@ $posts = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
-<body<?= $slideIn ? ' class="dashboard-slide-in"' : ''; ?>>
+<body<?= $dashboardTransitionClass !== '' ? ' class="' . $dashboardTransitionClass . '"' : ''; ?>>
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="post-create.php">Novo post</a>
                 <a href="logout.php">Sair</a>
             </nav>
         </div>
     </header>
 
-    <main class="container">
+    <main class="container page-shell">
         <section class="page-title">
-            <h1>Seus posts, <?= e((string) ($_SESSION['username'] ?? '')); ?></h1>
-            <a class="button-inline" href="post-create.php">Criar novo post</a>
+            <div>
+                <h1>Seus posts, <?= e((string) ($_SESSION['username'] ?? '')); ?></h1>
+                <p class="meta">Gerencie conteúdos publicados e atualize quando precisar.</p>
+            </div>
         </section>
 
         <?php if ($flash): ?>
@@ -62,7 +71,6 @@ $posts = $stmt->fetchAll();
                     <thead>
                         <tr>
                             <th>Título</th>
-                            <th>Slug</th>
                             <th>Criado em</th>
                             <th>Atualizado em</th>
                             <th>Ações</th>
@@ -74,12 +82,11 @@ $posts = $stmt->fetchAll();
                                 <td>
                                     <a href="post.php?id=<?= (int) $post['id']; ?>"><?= e($post['title']); ?></a>
                                 </td>
-                                <td><?= e($post['slug']); ?></td>
                                 <td><?= e(formatDate($post['created_at'])); ?></td>
                                 <td><?= e(formatDate($post['updated_at'])); ?></td>
                                 <td class="actions">
-                                    <a href="post-edit.php?id=<?= (int) $post['id']; ?>">Editar</a>
-                                    <a class="danger-link" href="post-delete.php?id=<?= (int) $post['id']; ?>">Excluir</a>
+                                    <a class="action-link" href="post-edit.php?id=<?= (int) $post['id']; ?>">Editar</a>
+                                    <a class="action-link danger-link" href="post-delete.php?id=<?= (int) $post['id']; ?>">Excluir</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -88,5 +95,12 @@ $posts = $stmt->fetchAll();
             </div>
         <?php endif; ?>
     </main>
+    <?php if ($enteredFromLogin): ?>
+        <script>
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, 'dashboard.php');
+        }
+        </script>
+    <?php endif; ?>
 </body>
 </html>

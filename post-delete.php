@@ -51,6 +51,7 @@ if (isPostRequest()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excluir post</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -58,18 +59,18 @@ if (isPostRequest()) {
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="post-create.php">Novo post</a>
+                <a href="post-create.php">Criar</a>
                 <a href="logout.php">Sair</a>
             </nav>
         </div>
     </header>
 
-    <main class="container">
+    <main class="container page-shell">
         <section class="card form-card">
             <h1>Confirmar exclusão</h1>
             <p>Tem certeza que deseja excluir o post <strong><?= e($post['title']); ?></strong>?</p>
 
-            <form method="post" action="post-delete.php?id=<?= (int) $postId; ?>">
+            <form method="post" action="post-delete.php?id=<?= (int) $postId; ?>" class="actions-row">
                 <button type="submit" name="confirm" value="yes" class="danger">Sim, excluir</button>
                 <button type="submit" name="confirm" value="no" class="secondary">Cancelar</button>
             </form>

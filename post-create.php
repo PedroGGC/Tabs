@@ -49,8 +49,9 @@ if (isPostRequest()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo post</title>
+    <title>Criar post</title>
     <link rel="stylesheet" href="public/css/style.css">
+    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -58,15 +59,15 @@ if (isPostRequest()) {
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="post-create.php">Novo post</a>
                 <a href="logout.php">Sair</a>
             </nav>
         </div>
     </header>
 
-    <main class="container">
+    <main class="container page-shell">
         <section class="card form-card">
             <h1>Criar post</h1>
+            <p class="meta form-intro">Escreva seu conteúdo e publique para a comunidade.</p>
 
             <?php if ($errors !== []): ?>
                 <div class="alert alert-error">
