@@ -8,7 +8,11 @@ requireLogin();
 
 $pdo = getPDO();
 $userId = currentUserId();
-$postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$postId = filter_input(INPUT_POST, 'post_id', FILTER_VALIDATE_INT);
+
+if ($postId === false || $postId === null) {
+    $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+}
 
 if ($postId === false || $postId === null) {
     setFlash('error', 'Post inválido.');
@@ -28,6 +32,7 @@ if (!$post) {
 }
 
 if (isPostRequest()) {
+    verifyCsrfOrFail();
     $confirm = $_POST['confirm'] ?? 'no';
 
     if ($confirm === 'yes') {
@@ -71,6 +76,8 @@ if (isPostRequest()) {
             <p>Tem certeza que deseja excluir o post <strong><?= e($post['title']); ?></strong>?</p>
 
             <form method="post" action="post-delete.php?id=<?= (int) $postId; ?>" class="actions-row">
+                <?= csrfInput(); ?>
+                <input type="hidden" name="post_id" value="<?= (int) $postId; ?>">
                 <button type="submit" name="confirm" value="yes" class="danger">Sim, excluir</button>
                 <button type="submit" name="confirm" value="no" class="secondary">Cancelar</button>
             </form>

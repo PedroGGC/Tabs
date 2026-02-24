@@ -14,6 +14,8 @@ $old = [
 ];
 
 if (isPostRequest()) {
+    verifyCsrfOrFail();
+
     $old['title'] = sanitize($_POST['title'] ?? '');
     $old['content'] = sanitize($_POST['content'] ?? '');
 
@@ -78,6 +80,8 @@ if (isPostRequest()) {
             <?php endif; ?>
 
             <form method="post" action="post-create.php">
+                <?= csrfInput(); ?>
+
                 <label for="title">Título</label>
                 <input type="text" id="title" name="title" value="<?= e($old['title']); ?>" required>
 
