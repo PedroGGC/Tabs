@@ -19,6 +19,12 @@ CREATE TABLE posts (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_posts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_posts_user_id (user_id),
-    INDEX idx_posts_created_at (created_at)
+    INDEX idx_posts_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- perf: optimized indexes for public listing and dashboard sorting/filter
+-- Índice para ordenação da listagem pública por data
+CREATE INDEX idx_posts_created_at ON posts(created_at);
+
+-- Índice composto para dashboard (filtra por usuário + ordena por data)
+CREATE INDEX idx_posts_user_created ON posts(user_id, created_at);

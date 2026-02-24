@@ -14,6 +14,8 @@ $oldIdentifier = '';
 $flash = getFlash();
 
 if (isPostRequest()) {
+    verifyCsrfOrFail();
+
     $oldIdentifier = sanitize($_POST['identifier'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -67,6 +69,8 @@ if (isPostRequest()) {
             <?php endif; ?>
 
             <form method="post" action="login.php">
+                <?= csrfInput(); ?>
+
                 <label for="identifier">E-mail ou Username</label>
                 <input type="text" id="identifier" name="identifier" value="<?= e($oldIdentifier); ?>" required>
 

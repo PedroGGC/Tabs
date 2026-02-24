@@ -20,14 +20,48 @@ if (
     unset($_SESSION['dashboard_transition']);
 }
 
+// perf: paginated dashboard query to reduce scanned and rendered rows
+$postsPerPage = 10;
+$currentPage = filter_input(
+    INPUT_GET,
+    'page',
+    FILTER_VALIDATE_INT,
+    ['options' => ['min_range' => 1]]
+);
+$currentPage = $currentPage === false || $currentPage === null ? 1 : $currentPage;
+
+$countStmt = $pdo->prepare('SELECT COUNT(*) FROM posts WHERE user_id = :user_id');
+$countStmt->execute(['user_id' => $userId]);
+$totalPosts = (int) $countStmt->fetchColumn();
+$totalPages = max(1, (int) ceil($totalPosts / $postsPerPage));
+
+if ($currentPage > $totalPages) {
+    $currentPage = $totalPages;
+}
+
+$offset = ($currentPage - 1) * $postsPerPage;
+
 $stmt = $pdo->prepare(
     'SELECT id, title, created_at, updated_at
      FROM posts
      WHERE user_id = :user_id
-     ORDER BY created_at DESC'
+     ORDER BY created_at DESC
+     LIMIT :limit OFFSET :offset'
 );
-$stmt->execute(['user_id' => $userId]);
+$stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+$stmt->bindValue(':limit', $postsPerPage, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $posts = $stmt->fetchAll();
+
+$buildPageUrl = static function (int $page): string {
+    $params = $_GET;
+    $params['page'] = $page;
+    return 'dashboard.php?' . http_build_query($params);
+};
+
+$hasPreviousPage = $currentPage > 1;
+$hasNextPage = $currentPage < $totalPages;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -101,6 +135,16 @@ $posts = $stmt->fetchAll();
                     </tbody>
                 </table>
             </div>
+            <?php if ($hasPreviousPage || $hasNextPage): ?>
+                <nav class="pagination" aria-label="Paginação dos seus posts">
+                    <?php if ($hasPreviousPage): ?>
+                        <a class="pagination-link" href="<?= e($buildPageUrl($currentPage - 1)); ?>">← Anterior</a>
+                    <?php endif; ?>
+                    <?php if ($hasNextPage): ?>
+                        <a class="pagination-link" href="<?= e($buildPageUrl($currentPage + 1)); ?>">Próxima →</a>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
         <?php endif; ?>
     </main>
 
@@ -111,6 +155,7 @@ $posts = $stmt->fetchAll();
                 Tem certeza que deseja excluir o post <strong id="delete-post-title"></strong>?
             </p>
             <form id="delete-modal-form" method="post" action="post-delete.php" data-no-transition="true">
+                <?= csrfInput(); ?>
                 <input type="hidden" name="post_id" id="delete-post-id" value="">
                 <input type="hidden" name="confirm" value="yes">
                 <div class="actions-row">

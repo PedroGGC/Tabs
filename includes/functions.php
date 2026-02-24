@@ -2,6 +2,19 @@
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
+    $isHttps = (
+        !empty($_SERVER['HTTPS']) &&
+        $_SERVER['HTTPS'] !== 'off'
+    ) || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
+
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+
     session_start();
 }
 
@@ -13,6 +26,37 @@ function e(?string $value): string
 function sanitize(string $value): string
 {
     return trim($value);
+}
+
+function csrfToken(): string
+{
+    if (empty($_SESSION['_csrf_token']) || !is_string($_SESSION['_csrf_token'])) {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['_csrf_token'];
+}
+
+function csrfInput(): string
+{
+    return '<input type="hidden" name="_csrf" value="' . e(csrfToken()) . '">';
+}
+
+function verifyCsrfOrFail(): void
+{
+    $submittedToken = $_POST['_csrf'] ?? '';
+    $sessionToken = $_SESSION['_csrf_token'] ?? '';
+
+    if (
+        !is_string($submittedToken) ||
+        !is_string($sessionToken) ||
+        $sessionToken === '' ||
+        !hash_equals($sessionToken, $submittedToken)
+    ) {
+        setFlash('error', 'Sessão expirada ou token CSRF inválido. Tente novamente.');
+        $target = $_SERVER['REQUEST_URI'] ?? 'index.php';
+        redirect(is_string($target) && $target !== '' ? $target : 'index.php');
+    }
 }
 
 function redirect(string $path): void

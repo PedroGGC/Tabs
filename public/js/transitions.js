@@ -1,6 +1,6 @@
 (function () {
     const body = document.body;
-    const DURATION_MS = 350;
+    const DURATION_MS = 250;
     const INCOMING_KEY = 'incoming';
     const SKIP_ENTER_ANIMATION_KEY = 'page-skip-enter-animation';
     const ENTER_CLASSES = [

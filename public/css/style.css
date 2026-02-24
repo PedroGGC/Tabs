@@ -541,6 +541,7 @@ body.page-leaving .page-shell {
     }
 }
 
+/* perf: reduced transition delay to 250ms */
 /* Slide global entre paginas */
 #page {
     min-height: 100vh;
@@ -549,19 +550,19 @@ body.page-leaving .page-shell {
 }
 
 body.page-enter-from-right {
-    animation: slideInFromRight 350ms ease-in-out both;
+    animation: slideInFromRight 250ms ease-in-out both;
 }
 
 body.page-enter-from-left {
-    animation: slideInFromLeft 350ms ease-in-out both;
+    animation: slideInFromLeft 250ms ease-in-out both;
 }
 
 body.page-enter-from-bottom {
-    animation: slideInFromBottom 350ms ease-in-out both;
+    animation: slideInFromBottom 250ms ease-in-out both;
 }
 
 body.page-enter-from-top {
-    animation: slideInFromTop 350ms ease-in-out both;
+    animation: slideInFromTop 250ms ease-in-out both;
 }
 
 body.page-enter-none #page,
@@ -579,22 +580,22 @@ body.page-enter-none {
 }
 
 body.page-leaving {
-    animation: slideOutToLeft 350ms ease-in-out both;
+    animation: slideOutToLeft 250ms ease-in-out both;
     pointer-events: none;
 }
 
 body.page-leaving-right {
-    animation: slideOutToRight 350ms ease-in-out both;
+    animation: slideOutToRight 250ms ease-in-out both;
     pointer-events: none;
 }
 
 body.page-leaving-up {
-    animation: slideOutToTop 350ms ease-in-out both;
+    animation: slideOutToTop 250ms ease-in-out both;
     pointer-events: none;
 }
 
 body.page-leaving-down {
-    animation: slideOutToBottom 350ms ease-in-out both;
+    animation: slideOutToBottom 250ms ease-in-out both;
     pointer-events: none;
 }
 
@@ -712,7 +713,7 @@ body.page-leaving-down .page-shell,
     background: rgba(16, 35, 63, 0.62);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 180ms ease;
+    transition: opacity 250ms ease;
 }
 
 .modal-overlay.is-open {
@@ -729,7 +730,7 @@ body.page-leaving-down .page-shell,
     padding: 20px;
     transform: scale(0.9);
     opacity: 0;
-    transition: transform 180ms ease, opacity 180ms ease;
+    transition: transform 250ms ease, opacity 250ms ease;
 }
 
 .modal-overlay.is-open .modal-card {

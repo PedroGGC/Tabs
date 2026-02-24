@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+function envValue(string $key, string $fallback): string
+{
+    $value = getenv($key);
+    if ($value === false) {
+        $value = $_ENV[$key] ?? ($_SERVER[$key] ?? $fallback);
+    }
+
+    $value = is_string($value) ? trim($value) : $fallback;
+    return $value !== '' ? $value : $fallback;
+}
+
 function getPDO(): PDO
 {
     static $pdo = null;
@@ -9,12 +20,12 @@ function getPDO(): PDO
         return $pdo;
     }
 
-    $host = 'localhost';
-    $port = '3306';
-    $dbName = 'blog_php';
-    $username = ''; //insert your database username here
-    $password = ''; // insert your database password here
-    $charset = 'utf8mb4';
+    $host = envValue('DB_HOST', 'localhost');
+    $port = envValue('DB_PORT', '3306');
+    $dbName = envValue('DB_NAME', 'blog_php');
+    $username = envValue('DB_USER', 'root');
+    $password = envValue('DB_PASS', '');
+    $charset = envValue('DB_CHARSET', 'utf8mb4');
 
     $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset={$charset}";
     $options = [
