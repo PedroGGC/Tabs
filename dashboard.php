@@ -11,6 +11,14 @@ $userId = currentUserId();
 $flash = getFlash();
 $dashboardTransitionClass = '';
 $enteredFromLogin = isset($_GET['entered']) && $_GET['entered'] === '1';
+$viewerStmt = $pdo->prepare('SELECT username, avatar FROM users WHERE id = :id LIMIT 1');
+$viewerStmt->execute(['id' => $userId]);
+$viewer = $viewerStmt->fetch();
+
+if (!$viewer) {
+    setFlash('error', 'Usuário não encontrado.');
+    redirect('logout.php');
+}
 
 if (
     $enteredFromLogin ||
@@ -77,7 +85,9 @@ $hasNextPage = $currentPage < $totalPages;
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
+                <a href="index.php">Explorar</a>
                 <a href="dashboard.php">Dashboard</a>
+                <a href="profile.php">Meu Perfil</a>
                 <a href="logout.php" data-transition="back">Sair</a>
             </nav>
         </div>
@@ -86,10 +96,23 @@ $hasNextPage = $currentPage < $totalPages;
     <main class="container page-shell">
         <section class="page-title">
             <div>
-                <h1>Seus posts, <?= e((string) ($_SESSION['username'] ?? '')); ?></h1>
+                <div class="author-row author-row-strong">
+                    <a href="profile.php" class="author-link">
+                        <?php if (!empty($viewer['avatar'])): ?>
+                            <img class="avatar avatar-sm" src="<?= e((string) $viewer['avatar']); ?>" alt="Avatar de <?= e((string) $viewer['username']); ?>">
+                        <?php else: ?>
+                            <span class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $viewer['username'])); ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <p class="meta">Olá, <strong><?= e((string) $viewer['username']); ?></strong></p>
+                </div>
+                <h1>Seus posts</h1>
                 <p class="meta">Gerencie conteúdos publicados e atualize quando precisar.</p>
             </div>
-            <a class="button-inline" href="post-create.php">Criar</a>
+            <div class="actions-row">
+                <a class="action-link" href="index.php">Ver posts públicos</a>
+                <a class="button-inline" href="post-create.php">Criar</a>
+            </div>
         </section>
 
         <?php if ($flash): ?>
