@@ -159,3 +159,13 @@ function formatDate(string $datetime): string
 
     return date('d/m/Y H:i', $timestamp);
 }
+
+function usernameInitial(string $username): string
+{
+    $value = trim($username);
+    if ($value === '') {
+        return '?';
+    }
+
+    return mb_strtoupper(mb_substr($value, 0, 1, 'UTF-8'), 'UTF-8');
+}

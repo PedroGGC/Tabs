@@ -16,6 +16,8 @@ $old = [
 ];
 
 if (isPostRequest()) {
+    verifyCsrfOrFail();
+
     $old['username'] = sanitize($_POST['username'] ?? '');
     $old['email'] = sanitize($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -63,6 +65,8 @@ if (isPostRequest()) {
             <?php endif; ?>
 
             <form method="post" action="register.php">
+                <?= csrfInput(); ?>
+
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" value="<?= e($old['username']); ?>" required>
 

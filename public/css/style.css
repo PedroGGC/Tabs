@@ -111,6 +111,7 @@ a:hover {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .nav nav a {
@@ -119,6 +120,15 @@ a:hover {
     background: rgba(255, 255, 255, 0.84);
     border: 1px solid rgba(183, 206, 232, 0.75);
     font-weight: 600;
+    color: #1f3f69;
+}
+
+.nav-user {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(232, 242, 254, 0.9);
+    border: 1px solid rgba(183, 206, 232, 0.75);
+    font-weight: 700;
     color: #1f3f69;
 }
 
@@ -190,6 +200,151 @@ h2 {
     color: var(--muted);
     font-size: 0.94rem;
     margin-top: 0;
+}
+
+.author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.author-row .meta {
+    margin: 0;
+}
+
+.author-row-strong {
+    margin-bottom: 6px;
+}
+
+.author-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #1f3f69;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.author-link:hover {
+    color: #14365f;
+}
+
+.author-link-name {
+    line-height: 1.2;
+}
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(159, 193, 231, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+    color: #264a73;
+    font-weight: 700;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.avatar-sm {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+}
+
+.avatar-lg {
+    width: 88px;
+    height: 88px;
+    font-size: 1.8rem;
+}
+
+.avatar-xl {
+    width: 118px;
+    height: 118px;
+    font-size: 2.2rem;
+}
+
+.avatar-fallback {
+    box-shadow: inset 0 0 0 2px rgba(159, 193, 231, 0.5);
+}
+
+.profile-avatar-preview {
+    margin-top: 10px;
+}
+
+.post-cover,
+.cover-preview {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid rgba(165, 197, 233, 0.7);
+    margin: 8px 0 12px;
+}
+
+.post-cover-full {
+    max-height: 380px;
+}
+
+.post-card-clickable {
+    position: relative;
+}
+
+.post-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: var(--radius);
+}
+
+.post-card-link:focus-visible {
+    outline: 2px solid rgba(27, 110, 209, 0.8);
+    outline-offset: 4px;
+}
+
+.post-card-clickable .author-link {
+    position: relative;
+    z-index: 3;
+}
+
+.user-profile-card {
+    text-align: center;
+}
+
+.user-profile-avatar-link {
+    display: inline-flex;
+    border-radius: 999px;
+}
+
+.user-bio {
+    margin-top: 14px;
+    text-align: left;
+}
+
+.user-bio p {
+    margin: 0;
+}
+
+.comment-form {
+    margin-bottom: 16px;
+}
+
+.comment-list {
+    display: grid;
+    gap: 12px;
+}
+
+.comment-item {
+    border: 1px solid rgba(182, 206, 230, 0.85);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.75);
+    padding: 12px;
+}
+
+.comment-content {
+    margin: 0;
+    white-space: pre-wrap;
 }
 
 .empty {
@@ -296,6 +451,76 @@ textarea:focus {
     outline: none;
     border-color: rgba(55, 128, 208, 0.95);
     box-shadow: 0 0 0 3px rgba(55, 128, 208, 0.16);
+}
+
+.inline-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 14px;
+    font-weight: 600;
+    color: #27496f;
+}
+
+.inline-check input {
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.hidden-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.avatar-editor {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.dashboard-avatar-form {
+    margin: 0;
+}
+
+.avatar-editor .avatar {
+    transition: filter 0.2s ease;
+}
+
+.avatar-editor-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 35, 63, 0.55);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    text-align: center;
+    padding: 8px;
+}
+
+.avatar-editor:hover .avatar-editor-overlay,
+.avatar-editor:focus-visible .avatar-editor-overlay {
+    opacity: 1;
+}
+
+.avatar-editor-sm .avatar-editor-overlay {
+    font-size: 0.66rem;
+    padding: 4px;
 }
 
 button.secondary {

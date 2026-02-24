@@ -26,7 +26,15 @@ if ($currentPage > $totalPages) {
 $offset = ($currentPage - 1) * $postsPerPage;
 
 $stmt = $pdo->prepare(
-    'SELECT posts.id, posts.title, LEFT(posts.content, 400) AS content, posts.created_at, users.username AS author
+    'SELECT
+        posts.id,
+        posts.title,
+        LEFT(posts.content, 400) AS content,
+        posts.cover_image,
+        posts.created_at,
+        users.id AS author_id,
+        users.username AS author,
+        users.avatar AS author_avatar
      FROM posts
      INNER JOIN users ON users.id = posts.user_id
      ORDER BY posts.created_at DESC
@@ -61,6 +69,7 @@ $hasNextPage = $currentPage < $totalPages;
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <?php if (isLogged()): ?>
+                    <span class="nav-user">Olá, <?= e((string) ($_SESSION['username'] ?? '')); ?></span>
                     <a href="dashboard.php">Dashboard</a>
                     <a href="logout.php" data-transition="back">Sair</a>
                 <?php else: ?>
@@ -86,15 +95,25 @@ $hasNextPage = $currentPage < $totalPages;
             <p class="empty">Nenhum post publicado ainda.</p>
         <?php else: ?>
             <?php foreach ($posts as $post): ?>
-                <article class="card post-card">
-                    <h2>
-                        <a href="post.php?id=<?= (int) $post['id']; ?>"><?= e($post['title']); ?></a>
-                    </h2>
-                    <p class="meta">
-                        Por <strong><?= e($post['author']); ?></strong> em <?= e(formatDate($post['created_at'])); ?>
-                    </p>
-                    <p><?= e(excerpt($post['content'])); ?></p>
-                    <a class="read-more" href="post.php?id=<?= (int) $post['id']; ?>">Continuar leitura</a>
+                <article class="card post-card post-card-clickable">
+                    <a
+                        class="post-card-link"
+                        href="post.php?id=<?= (int) $post['id']; ?>"
+                        aria-label="Abrir post <?= e((string) $post['title']); ?>"
+                    ></a>
+                    <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>">
+                        <?php if (!empty($post['author_avatar'])): ?>
+                            <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>" alt="Avatar de <?= e($post['author']); ?>">
+                        <?php else: ?>
+                            <span class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
+                        <?php endif; ?>
+                        <span class="author-link-name"><?= e($post['author']); ?></span>
+                    </a>
+                    <h2><?= e($post['title']); ?></h2>
+                    <?php if (!empty($post['cover_image'])): ?>
+                        <img class="post-cover" src="<?= e((string) $post['cover_image']); ?>" alt="Imagem de capa de <?= e($post['title']); ?>">
+                    <?php endif; ?>
+                    <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
                 </article>
             <?php endforeach; ?>
 
