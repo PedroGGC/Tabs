@@ -1,1 +1,5 @@
 config/database.php
+public/uploads/covers/*
+!public/uploads/covers/.gitkeep
+public/uploads/avatars/*
+!public/uploads/avatars/.gitkeep
