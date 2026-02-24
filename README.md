@@ -12,6 +12,7 @@ A functional blog project built with plain PHP and MySQL, including session-base
 - Native PHP Sessions
 - `password_hash()` / `password_verify()` with bcrypt
 - Minimal HTML/CSS
+- JavaScript (vanilla)
 
 ## Project Structure
 ```text
@@ -22,8 +23,10 @@ blog-php/
 │   ├── auth.php
 │   └── functions.php
 ├── public/
-│   └── css/
-│       └── style.css
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── transitions.js
 ├── database/
 │   └── blog.sql
 ├── index.php
@@ -56,12 +59,25 @@ cd blog-php
 mysql -u root -p < database/blog.sql
 ```
 
-4. Configure your database credentials in `config/database.php`:
-- `$host`
-- `$port`
-- `$dbName`
-- `$username`
-- `$password`
+4. Configure your database credentials using environment variables:
+- `DB_HOST`
+- `DB_PORT`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+- `DB_CHARSET`
+
+Example (PowerShell):
+```powershell
+$env:DB_HOST='localhost'
+$env:DB_PORT='3306'
+$env:DB_NAME='blog_php'
+$env:DB_USER='root'
+$env:DB_PASS=''
+$env:DB_CHARSET='utf8mb4'
+```
+
+You can keep local development without ENV because `config/database.php` has safe local fallbacks.
 
 5. Run the project on a local server (XAMPP/WAMP):
 - Place the `blog-php` folder inside `htdocs` (XAMPP) or `www` (WAMP), or configure a virtual host.
@@ -82,7 +98,4 @@ http://localhost/blog-php
 - Password hashing with bcrypt.
 - Access control for protected pages.
 - Author ownership validation for editing/deleting posts.
-
-## Screenshots
-<!-- screenshot aqui -->
 
