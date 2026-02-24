@@ -36,9 +36,9 @@ if (isPostRequest()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro</title>
     <link rel="stylesheet" href="public/css/style.css">
-    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
+    <div id="page">
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
@@ -78,5 +78,7 @@ if (isPostRequest()) {
             <p class="meta">Já tem conta? <a href="login.php">Faça login</a>.</p>
         </section>
     </main>
+    </div>
+    <script src="public/js/transitions.js"></script>
 </body>
 </html>
