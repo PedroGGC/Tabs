@@ -36,15 +36,15 @@ $posts = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="public/css/style.css">
-    <script defer src="public/js/transitions.js"></script>
 </head>
 <body<?= $dashboardTransitionClass !== '' ? ' class="' . $dashboardTransitionClass . '"' : ''; ?>>
+    <div id="page">
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="logout.php">Sair</a>
+                <a href="logout.php" data-transition="back">Sair</a>
             </nav>
         </div>
     </header>
@@ -55,6 +55,7 @@ $posts = $stmt->fetchAll();
                 <h1>Seus posts, <?= e((string) ($_SESSION['username'] ?? '')); ?></h1>
                 <p class="meta">Gerencie conteúdos publicados e atualize quando precisar.</p>
             </div>
+            <a class="button-inline" href="post-create.php">Criar</a>
         </section>
 
         <?php if ($flash): ?>
@@ -85,8 +86,15 @@ $posts = $stmt->fetchAll();
                                 <td><?= e(formatDate($post['created_at'])); ?></td>
                                 <td><?= e(formatDate($post['updated_at'])); ?></td>
                                 <td class="actions">
-                                    <a class="action-link" href="post-edit.php?id=<?= (int) $post['id']; ?>">Editar</a>
-                                    <a class="action-link danger-link" href="post-delete.php?id=<?= (int) $post['id']; ?>">Excluir</a>
+                                    <a class="action-link" href="post-edit.php?id=<?= (int) $post['id']; ?>" data-transition="up">Editar</a>
+                                    <button
+                                        type="button"
+                                        class="action-link danger-link js-delete-trigger"
+                                        data-id="<?= (int) $post['id']; ?>"
+                                        data-title="<?= e($post['title']); ?>"
+                                    >
+                                        Excluir
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -95,6 +103,24 @@ $posts = $stmt->fetchAll();
             </div>
         <?php endif; ?>
     </main>
+
+    <div id="delete-modal" class="modal-overlay" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+            <h2 id="delete-modal-title">Confirmar exclusão</h2>
+            <p class="modal-message">
+                Tem certeza que deseja excluir o post <strong id="delete-post-title"></strong>?
+            </p>
+            <form id="delete-modal-form" method="post" action="post-delete.php" data-no-transition="true">
+                <input type="hidden" name="post_id" id="delete-post-id" value="">
+                <input type="hidden" name="confirm" value="yes">
+                <div class="actions-row">
+                    <button type="button" class="secondary js-modal-cancel">Cancelar</button>
+                    <button type="submit" class="danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
     <?php if ($enteredFromLogin): ?>
         <script>
         if (window.history && window.history.replaceState) {
@@ -102,5 +128,62 @@ $posts = $stmt->fetchAll();
         }
         </script>
     <?php endif; ?>
+    <script>
+    (function () {
+        const modal = document.getElementById('delete-modal');
+        const form = document.getElementById('delete-modal-form');
+        const postIdInput = document.getElementById('delete-post-id');
+        const postTitle = document.getElementById('delete-post-title');
+        const cancelButton = modal ? modal.querySelector('.js-modal-cancel') : null;
+        const triggers = document.querySelectorAll('.js-delete-trigger');
+
+        if (!modal || !form || !postIdInput || !postTitle || !cancelButton) {
+            return;
+        }
+
+        const closeModal = function () {
+            modal.classList.remove('is-open');
+            window.setTimeout(function () {
+                modal.hidden = true;
+            }, 180);
+        };
+
+        const openModal = function (id, title) {
+            postIdInput.value = id;
+            postTitle.textContent = title;
+            form.action = 'post-delete.php?id=' + encodeURIComponent(id);
+            modal.hidden = false;
+            window.requestAnimationFrame(function () {
+                modal.classList.add('is-open');
+            });
+        };
+
+        triggers.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const id = button.getAttribute('data-id') || '';
+                const title = button.getAttribute('data-title') || '';
+                if (!id) {
+                    return;
+                }
+                openModal(id, title);
+            });
+        });
+
+        cancelButton.addEventListener('click', closeModal);
+
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && !modal.hidden) {
+                closeModal();
+            }
+        });
+    })();
+    </script>
+    <script src="public/js/transitions.js"></script>
 </body>
 </html>
