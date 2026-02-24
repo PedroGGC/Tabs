@@ -51,15 +51,15 @@ if (isPostRequest()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar post</title>
     <link rel="stylesheet" href="public/css/style.css">
-    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
+    <div id="page">
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="logout.php">Sair</a>
+                <a href="logout.php" data-transition="back">Sair</a>
             </nav>
         </div>
     </header>
@@ -88,5 +88,7 @@ if (isPostRequest()) {
             </form>
         </section>
     </main>
+    </div>
+    <script src="public/js/transitions.js"></script>
 </body>
 </html>

@@ -73,16 +73,15 @@ if (isPostRequest()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar post</title>
     <link rel="stylesheet" href="public/css/style.css">
-    <script defer src="public/js/transitions.js"></script>
 </head>
 <body>
+    <div id="page">
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="index.php">Blog PHP</a>
             <nav>
                 <a href="dashboard.php">Dashboard</a>
-                <a href="post-create.php">Criar</a>
-                <a href="logout.php">Sair</a>
+                <a href="logout.php" data-transition="back">Sair</a>
             </nav>
         </div>
     </header>
@@ -100,7 +99,7 @@ if (isPostRequest()) {
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="post-edit.php?id=<?= (int) $postId; ?>">
+            <form method="post" action="post-edit.php?id=<?= (int) $postId; ?>" data-transition="down">
                 <label for="title">Título</label>
                 <input type="text" id="title" name="title" value="<?= e($old['title']); ?>" required>
 
@@ -111,5 +110,7 @@ if (isPostRequest()) {
             </form>
         </section>
     </main>
+    </div>
+    <script src="public/js/transitions.js"></script>
 </body>
 </html>

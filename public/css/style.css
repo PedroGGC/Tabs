@@ -33,7 +33,9 @@ body {
     color: var(--text);
     background: linear-gradient(140deg, var(--bg-start), var(--bg-mid) 46%, var(--bg-end));
     position: relative;
-    overflow-x: hidden;
+    overflow-x: visible;
+    opacity: 0;
+    transform: translateX(0);
 }
 
 body::before,
@@ -537,4 +539,205 @@ body.page-leaving .page-shell {
     .container {
         width: min(1080px, 94%);
     }
+}
+
+/* Slide global entre paginas */
+#page {
+    min-height: 100vh;
+    overflow-x: hidden;
+    will-change: transform, opacity;
+}
+
+body.page-enter-from-right {
+    animation: slideInFromRight 350ms ease-in-out both;
+}
+
+body.page-enter-from-left {
+    animation: slideInFromLeft 350ms ease-in-out both;
+}
+
+body.page-enter-from-bottom {
+    animation: slideInFromBottom 350ms ease-in-out both;
+}
+
+body.page-enter-from-top {
+    animation: slideInFromTop 350ms ease-in-out both;
+}
+
+body.page-enter-none #page,
+body.page-enter-none .site-header,
+body.page-enter-none .page-shell,
+body.page-enter-none .card,
+body.page-enter-none .alert {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.page-enter-none {
+    opacity: 1 !important;
+    transform: translate(0, 0) !important;
+}
+
+body.page-leaving {
+    animation: slideOutToLeft 350ms ease-in-out both;
+    pointer-events: none;
+}
+
+body.page-leaving-right {
+    animation: slideOutToRight 350ms ease-in-out both;
+    pointer-events: none;
+}
+
+body.page-leaving-up {
+    animation: slideOutToTop 350ms ease-in-out both;
+    pointer-events: none;
+}
+
+body.page-leaving-down {
+    animation: slideOutToBottom 350ms ease-in-out both;
+    pointer-events: none;
+}
+
+body.page-leaving .site-header,
+body.page-leaving-right .site-header,
+body.page-leaving-up .site-header,
+body.page-leaving-down .site-header,
+body.page-leaving .page-shell,
+body.page-leaving-right .page-shell,
+body.page-leaving-up .page-shell,
+body.page-leaving-down .page-shell,
+.dashboard-slide-in .site-header,
+.dashboard-slide-in .page-shell,
+.dashboard-slide-in .page-shell > * {
+    animation: none !important;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromBottom {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutToTop {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutToBottom {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+/* Modal de confirmacao */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(16, 35, 63, 0.62);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+}
+
+.modal-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-card {
+    width: min(520px, 100%);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 20px 42px rgba(9, 22, 38, 0.3);
+    padding: 20px;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.modal-overlay.is-open .modal-card {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-message {
+    margin: 0 0 16px;
+    color: var(--muted);
 }
