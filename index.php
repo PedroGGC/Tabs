@@ -5,6 +5,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
 
 $pdo = getPDO();
+$flash = getFlash();
 // perf: paginated public listing and reduced selected content payload
 $postsPerPage = 6;
 $currentPage = filter_input(
@@ -59,14 +60,14 @@ $hasNextPage = $currentPage < $totalPages;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog PHP</title>
+    <title>Threadly | Início</title>
     <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
     <div id="page">
     <header class="site-header">
         <div class="container nav">
-            <a class="brand" href="index.php">Blog PHP</a>
+            <a class="brand" href="index.php">Threadly</a>
             <nav>
                 <?php if (isLogged()): ?>
                     <span class="nav-user">Olá, <?= e((string) ($_SESSION['username'] ?? '')); ?></span>
@@ -81,6 +82,12 @@ $hasNextPage = $currentPage < $totalPages;
     </header>
 
     <main class="container page-shell">
+        <?php if ($flash): ?>
+            <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
+                <p><?= e($flash['message']); ?></p>
+            </div>
+        <?php endif; ?>
+
         <section class="card hero">
             <div>
                 <h1>Posts recentes</h1>

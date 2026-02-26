@@ -5,7 +5,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
 
 if (isLogged()) {
-    redirect('dashboard.php');
+    redirect('index.php');
 }
 
 $pdo = getPDO();
@@ -22,8 +22,7 @@ if (isPostRequest()) {
     $result = loginUser($pdo, $oldIdentifier, $password);
     if ($result['success']) {
         setFlash('success', 'Login realizado com sucesso.');
-        $_SESSION['dashboard_transition'] = 'slide_in_right';
-        redirect('dashboard.php?entered=1');
+        redirect('index.php');
     }
 
     $errors = $result['errors'];
@@ -34,14 +33,14 @@ if (isPostRequest()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Threadly | Login</title>
     <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
     <div id="page">
     <header class="site-header">
         <div class="container nav">
-            <a class="brand" href="index.php">Blog PHP</a>
+            <a class="brand" href="index.php">Threadly</a>
             <nav>
                 <a href="login.php">Login</a>
                 <a href="register.php">Cadastro</a>
