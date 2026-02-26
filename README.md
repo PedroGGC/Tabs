@@ -1,9 +1,9 @@
-# PHP Blog with Authentication
+# Tabs
 
 ![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?logo=mysql&logoColor=white)
 
-A functional blog project built with plain PHP and MySQL, including session-based authentication and full post CRUD with author ownership checks.
+Tabs is a social blog project built with plain PHP and MySQL, with session-based authentication, posts, profiles, and threaded comments.
 
 ## Technologies
 - PHP 8.1+
@@ -21,7 +21,9 @@ blog-php/
 │   └── database.php
 ├── includes/
 │   ├── auth.php
-│   └── functions.php
+│   ├── functions.php
+│   ├── post-functions.php
+│   └── comment-functions.php
 ├── public/
 │   ├── css/
 │   │   └── style.css
@@ -35,9 +37,11 @@ blog-php/
 ├── login.php
 ├── logout.php
 ├── dashboard.php
-├── post-create.php
-├── post-edit.php
-├── post-delete.php
+├── profile.php
+├── user.php
+├── posts.php
+├── comments.php
+├── notifications-read.php
 └── README.md
 ```
 

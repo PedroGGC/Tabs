@@ -34,7 +34,7 @@ body {
     background: linear-gradient(140deg, var(--bg-start), var(--bg-mid) 46%, var(--bg-end));
     position: relative;
     overflow-x: visible;
-    opacity: 0;
+    opacity: 1;
     transform: translateX(0);
 }
 
@@ -786,17 +786,6 @@ th {
     line-height: 1.85;
 }
 
-body.page-leaving {
-    pointer-events: none;
-}
-
-body.page-leaving .site-header {
-    animation: pageOutTop 0.26s ease-in both;
-}
-
-body.page-leaving .page-shell {
-    animation: pageOutMain 0.28s cubic-bezier(0.4, 0, 0.6, 1) both;
-}
 
 .dashboard-slide-in .site-header {
     animation: dashboardHeaderIn 0.48s ease-out both;
@@ -991,19 +980,7 @@ body.page-leaving-down {
     pointer-events: none;
 }
 
-body.page-leaving .site-header,
-body.page-leaving-right .site-header,
-body.page-leaving-up .site-header,
-body.page-leaving-down .site-header,
-body.page-leaving .page-shell,
-body.page-leaving-right .page-shell,
-body.page-leaving-up .page-shell,
-body.page-leaving-down .page-shell,
-.dashboard-slide-in .site-header,
-.dashboard-slide-in .page-shell,
-.dashboard-slide-in .page-shell > * {
-    animation: none !important;
-}
+
 
 @keyframes slideInFromRight {
     from {

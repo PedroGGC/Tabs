@@ -250,156 +250,151 @@ if (isPostRequest()) {
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil</title>
     <link rel="stylesheet" href="public/css/style.css">
 </head>
+
 <body>
     <div id="page">
-    <header class="site-header">
-        <div class="container nav">
-            <a class="brand" href="index.php">Blog PHP</a>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="profile.php">Meu Perfil</a>
-                <a href="logout.php" data-transition="back">Sair</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container page-shell">
-        <?php if ($flash): ?>
-            <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
-                <p><?= e($flash['message']); ?></p>
+        <header class="site-header">
+            <div class="container nav">
+                <a class="brand" href="index.php">Blog PHP</a>
+                <nav>
+                    <a href="dashboard.php">Dashboard</a>
+                    <a href="profile.php">Meu Perfil</a>
+                    <a href="logout.php" data-transition="back">Sair</a>
+                </nav>
             </div>
-        <?php endif; ?>
+        </header>
 
-        <section class="card form-card profile-card">
-            <h1>Foto de perfil</h1>
-            <p class="meta form-intro">Clique na foto para editar.</p>
+        <main class="container page-shell">
+            <?php if ($flash): ?>
+                <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
+                    <p><?= e($flash['message']); ?></p>
+                </div>
+            <?php endif; ?>
 
-            <form id="avatar-upload-form" method="post" action="profile.php?action=avatar" enctype="multipart/form-data">
-                <?= csrfInput(); ?>
-                <input type="hidden" name="return_to" value="profile.php">
-                <input
-                    type="file"
-                    id="avatar-input"
-                    name="avatar"
-                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                    class="hidden-file-input"
-                >
-            </form>
+            <section class="card form-card profile-card">
+                <h1>Foto de perfil</h1>
+                <p class="meta form-intro">Clique na foto para editar.</p>
 
-            <button type="button" id="avatar-trigger" class="avatar-editor" aria-label="Editar foto de perfil">
-                <?php if (!empty($user['avatar'])): ?>
-                    <img src="<?= e((string) $user['avatar']); ?>" alt="Foto de perfil de <?= e((string) $user['username']); ?>" class="avatar avatar-lg">
-                <?php else: ?>
-                    <span class="avatar avatar-lg avatar-fallback"><?= e(usernameInitial((string) $user['username'])); ?></span>
-                <?php endif; ?>
-                <span class="avatar-editor-overlay">Editar foto</span>
-            </button>
-
-            <?php if (!empty($user['avatar'])): ?>
-                <form id="avatar-remove-form" method="post" action="profile.php?action=avatar">
+                <form id="avatar-upload-form" method="post" action="profile.php?action=avatar"
+                    enctype="multipart/form-data">
                     <?= csrfInput(); ?>
                     <input type="hidden" name="return_to" value="profile.php">
-                    <label class="inline-check" for="remove_avatar">
-                        <input type="checkbox" id="remove_avatar" name="remove_avatar" value="1">
-                        Remover foto atual
-                    </label>
+                    <input type="file" id="avatar-input" name="avatar"
+                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="hidden-file-input">
                 </form>
-            <?php endif; ?>
-        </section>
 
-        <section class="card form-card">
-            <h2>Alterar username</h2>
-            <form method="post" action="profile.php?action=username">
-                <?= csrfInput(); ?>
-                <label for="username">Username</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value="<?= e((string) $user['username']); ?>"
-                    minlength="3"
-                    pattern="[A-Za-z0-9_]+"
-                    required
-                >
-                <button type="submit">Salvar username</button>
-            </form>
-        </section>
+                <button type="button" id="avatar-trigger" class="avatar-editor" aria-label="Editar foto de perfil">
+                    <?php if (!empty($user['avatar'])): ?>
+                        <img src="<?= e((string) $user['avatar']); ?>"
+                            alt="Foto de perfil de <?= e((string) $user['username']); ?>" class="avatar avatar-lg">
+                    <?php else: ?>
+                        <span
+                            class="avatar avatar-lg avatar-fallback"><?= e(usernameInitial((string) $user['username'])); ?></span>
+                    <?php endif; ?>
+                    <span class="avatar-editor-overlay">Editar foto</span>
+                </button>
 
-        <section class="card form-card">
-            <h2>Sobre mim</h2>
-            <form method="post" action="profile.php?action=bio">
-                <?= csrfInput(); ?>
-                <label for="bio">Biografia (opcional)</label>
-                <textarea id="bio" name="bio" maxlength="300" rows="5"><?= e((string) ($user['bio'] ?? '')); ?></textarea>
-                <p class="meta" id="bio-counter">0/300 caracteres</p>
-                <button type="submit">Salvar bio</button>
-            </form>
-        </section>
+                <?php if (!empty($user['avatar'])): ?>
+                    <form id="avatar-remove-form" method="post" action="profile.php?action=avatar">
+                        <?= csrfInput(); ?>
+                        <input type="hidden" name="return_to" value="profile.php">
+                        <label class="inline-check" for="remove_avatar">
+                            <input type="checkbox" id="remove_avatar" name="remove_avatar" value="1">
+                            Remover foto atual
+                        </label>
+                    </form>
+                <?php endif; ?>
+            </section>
 
-        <section class="card form-card">
-            <h2>Alterar senha</h2>
-            <form method="post" action="profile.php?action=password">
-                <?= csrfInput(); ?>
-                <label for="current_password">Senha atual</label>
-                <input type="password" id="current_password" name="current_password" required>
+            <section class="card form-card">
+                <h2>Alterar username</h2>
+                <form method="post" action="profile.php?action=username">
+                    <?= csrfInput(); ?>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="<?= e((string) $user['username']); ?>"
+                        minlength="3" pattern="[A-Za-z0-9_]+" required>
+                    <button type="submit">Salvar username</button>
+                </form>
+            </section>
 
-                <label for="new_password">Nova senha (mínimo 8 caracteres)</label>
-                <input type="password" id="new_password" name="new_password" minlength="8" required>
+            <section class="card form-card">
+                <h2>Sobre mim</h2>
+                <form method="post" action="profile.php?action=bio">
+                    <?= csrfInput(); ?>
+                    <label for="bio">Biografia (opcional)</label>
+                    <textarea id="bio" name="bio" maxlength="300"
+                        rows="5"><?= e((string) ($user['bio'] ?? '')); ?></textarea>
+                    <p class="meta" id="bio-counter">0/300 caracteres</p>
+                    <button type="submit">Salvar bio</button>
+                </form>
+            </section>
 
-                <label for="confirm_password">Confirmar nova senha</label>
-                <input type="password" id="confirm_password" name="confirm_password" minlength="8" required>
+            <section class="card form-card">
+                <h2>Alterar senha</h2>
+                <form method="post" action="profile.php?action=password">
+                    <?= csrfInput(); ?>
+                    <label for="current_password">Senha atual</label>
+                    <input type="password" id="current_password" name="current_password" required>
 
-                <button type="submit">Salvar senha</button>
-            </form>
-        </section>
-    </main>
+                    <label for="new_password">Nova senha (mínimo 8 caracteres)</label>
+                    <input type="password" id="new_password" name="new_password" minlength="8" required>
+
+                    <label for="confirm_password">Confirmar nova senha</label>
+                    <input type="password" id="confirm_password" name="confirm_password" minlength="8" required>
+
+                    <button type="submit">Salvar senha</button>
+                </form>
+            </section>
+        </main>
     </div>
     <script>
-    (function () {
-        const avatarTrigger = document.getElementById('avatar-trigger');
-        const avatarInput = document.getElementById('avatar-input');
-        const avatarUploadForm = document.getElementById('avatar-upload-form');
-        const removeCheckbox = document.getElementById('remove_avatar');
-        const removeForm = document.getElementById('avatar-remove-form');
-        const bioField = document.getElementById('bio');
-        const bioCounter = document.getElementById('bio-counter');
+        (function () {
+            const avatarTrigger = document.getElementById('avatar-trigger');
+            const avatarInput = document.getElementById('avatar-input');
+            const avatarUploadForm = document.getElementById('avatar-upload-form');
+            const removeCheckbox = document.getElementById('remove_avatar');
+            const removeForm = document.getElementById('avatar-remove-form');
+            const bioField = document.getElementById('bio');
+            const bioCounter = document.getElementById('bio-counter');
 
-        if (avatarTrigger && avatarInput && avatarUploadForm) {
-            avatarTrigger.addEventListener('click', function () {
-                avatarInput.click();
-            });
+            if (avatarTrigger && avatarInput && avatarUploadForm) {
+                avatarTrigger.addEventListener('click', function () {
+                    avatarInput.click();
+                });
 
-            avatarInput.addEventListener('change', function () {
-                if (avatarInput.files && avatarInput.files.length > 0) {
-                    avatarUploadForm.submit();
-                }
-            });
-        }
+                avatarInput.addEventListener('change', function () {
+                    if (avatarInput.files && avatarInput.files.length > 0) {
+                        avatarUploadForm.submit();
+                    }
+                });
+            }
 
-        if (removeCheckbox && removeForm) {
-            removeCheckbox.addEventListener('change', function () {
-                if (removeCheckbox.checked) {
-                    removeForm.submit();
-                }
-            });
-        }
+            if (removeCheckbox && removeForm) {
+                removeCheckbox.addEventListener('change', function () {
+                    if (removeCheckbox.checked) {
+                        removeForm.submit();
+                    }
+                });
+            }
 
-        if (bioField && bioCounter) {
-            const updateCounter = function () {
-                bioCounter.textContent = bioField.value.length + '/300 caracteres';
-            };
+            if (bioField && bioCounter) {
+                const updateCounter = function () {
+                    bioCounter.textContent = bioField.value.length + '/300 caracteres';
+                };
 
-            bioField.addEventListener('input', updateCounter);
-            updateCounter();
-        }
-    })();
+                bioField.addEventListener('input', updateCounter);
+                updateCounter();
+            }
+        })();
     </script>
     <script src="public/js/transitions.js"></script>
 </body>
+
 </html>

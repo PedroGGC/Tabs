@@ -1,4 +1,4 @@
-# Performance Audit - blog-php
+# Performance Audit - Tabs
 
 ## Scope
 This audit focuses on runtime hotspots without applying performance changes in this cycle.
@@ -124,3 +124,4 @@ Expected benefit:
 - No severe DB bottleneck exists at current dataset size, but query plans already show scale risks (`Using filesort`) in list endpoints.
 - Highest ROI next step: composite index + pagination.
 - This cycle intentionally did not apply performance optimizations, only diagnosis.
+

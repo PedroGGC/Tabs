@@ -57,86 +57,90 @@ $hasNextPage = $currentPage < $totalPages;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Threadly | Início</title>
     <link rel="stylesheet" href="public/css/style.css">
 </head>
+
 <body>
     <div id="page">
-    <header class="site-header">
-        <div class="container nav">
-            <a class="brand" href="index.php">Threadly</a>
-            <nav>
-                <?php if (isLogged()): ?>
-                    <span class="nav-user">Olá, <?= e((string) ($_SESSION['username'] ?? '')); ?></span>
-                    <a href="dashboard.php">Dashboard</a>
-                    <a href="logout.php" data-transition="back">Sair</a>
-                <?php else: ?>
-                    <a href="login.php">Login</a>
-                    <a href="register.php">Cadastro</a>
-                <?php endif; ?>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container page-shell">
-        <?php if ($flash): ?>
-            <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
-                <p><?= e($flash['message']); ?></p>
-            </div>
-        <?php endif; ?>
-
-        <section class="card hero">
-            <div>
-                <h1>Posts recentes</h1>
-                <p class="hero-subtitle">Leituras rápidas, ideias e atualizações publicadas pelos autores da plataforma.</p>
-            </div>
-            <?php if (isLogged()): ?>
-                <a class="button-inline" href="post-create.php">Criar</a>
-            <?php endif; ?>
-        </section>
-
-        <?php if ($posts === []): ?>
-            <p class="empty">Nenhum post publicado ainda.</p>
-        <?php else: ?>
-            <?php foreach ($posts as $post): ?>
-                <article class="card post-card post-card-clickable">
-                    <a
-                        class="post-card-link"
-                        href="post.php?id=<?= (int) $post['id']; ?>"
-                        aria-label="Abrir post <?= e((string) $post['title']); ?>"
-                    ></a>
-                    <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>">
-                        <?php if (!empty($post['author_avatar'])): ?>
-                            <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>" alt="Avatar de <?= e($post['author']); ?>">
-                        <?php else: ?>
-                            <span class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
-                        <?php endif; ?>
-                        <span class="author-link-name"><?= e($post['author']); ?></span>
-                    </a>
-                    <h2><?= e($post['title']); ?></h2>
-                    <?php if (!empty($post['cover_image'])): ?>
-                        <img class="post-cover" src="<?= e((string) $post['cover_image']); ?>" alt="Imagem de capa de <?= e($post['title']); ?>">
-                    <?php endif; ?>
-                    <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
-                </article>
-            <?php endforeach; ?>
-
-            <?php if ($hasPreviousPage || $hasNextPage): ?>
-                <nav class="pagination" aria-label="Paginação">
-                    <?php if ($hasPreviousPage): ?>
-                        <a class="pagination-link" href="<?= e($buildPageUrl($currentPage - 1)); ?>">← Anterior</a>
-                    <?php endif; ?>
-                    <?php if ($hasNextPage): ?>
-                        <a class="pagination-link" href="<?= e($buildPageUrl($currentPage + 1)); ?>">Próxima →</a>
+        <header class="site-header">
+            <div class="container nav">
+                <a class="brand" href="index.php">Threadly</a>
+                <nav>
+                    <?php if (isLogged()): ?>
+                        <span class="nav-user">Olá, <?= e((string) ($_SESSION['username'] ?? '')); ?></span>
+                        <a href="dashboard.php">Dashboard</a>
+                        <a href="logout.php" data-transition="back">Sair</a>
+                    <?php else: ?>
+                        <a href="login.php">Login</a>
+                        <a href="register.php">Cadastro</a>
                     <?php endif; ?>
                 </nav>
+            </div>
+        </header>
+
+        <main class="container page-shell">
+            <?php if ($flash): ?>
+                <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
+                    <p><?= e($flash['message']); ?></p>
+                </div>
             <?php endif; ?>
-        <?php endif; ?>
-    </main>
+
+            <section class="card hero">
+                <div>
+                    <h1>Posts recentes</h1>
+                    <p class="hero-subtitle">Leituras rápidas, ideias e atualizações publicadas pelos autores da
+                        plataforma.</p>
+                </div>
+                <?php if (isLogged()): ?>
+                    <a class="button-inline" href="posts.php?action=create" data-transition="up">Criar</a>
+                <?php endif; ?>
+            </section>
+
+            <?php if ($posts === []): ?>
+                <p class="empty">Nenhum post publicado ainda.</p>
+            <?php else: ?>
+                <?php foreach ($posts as $post): ?>
+                    <article class="card post-card post-card-clickable">
+                        <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>"
+                            aria-label="Abrir post <?= e((string) $post['title']); ?>"></a>
+                        <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>">
+                            <?php if (!empty($post['author_avatar'])): ?>
+                                <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>"
+                                    alt="Avatar de <?= e($post['author']); ?>">
+                            <?php else: ?>
+                                <span
+                                    class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
+                            <?php endif; ?>
+                            <span class="author-link-name"><?= e($post['author']); ?></span>
+                        </a>
+                        <h2><?= e($post['title']); ?></h2>
+                        <?php if (!empty($post['cover_image'])): ?>
+                            <img class="post-cover" src="<?= e((string) $post['cover_image']); ?>"
+                                alt="Imagem de capa de <?= e($post['title']); ?>">
+                        <?php endif; ?>
+                        <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
+                    </article>
+                <?php endforeach; ?>
+
+                <?php if ($hasPreviousPage || $hasNextPage): ?>
+                    <nav class="pagination" aria-label="Paginação">
+                        <?php if ($hasPreviousPage): ?>
+                            <a class="pagination-link" href="<?= e($buildPageUrl($currentPage - 1)); ?>">← Anterior</a>
+                        <?php endif; ?>
+                        <?php if ($hasNextPage): ?>
+                            <a class="pagination-link" href="<?= e($buildPageUrl($currentPage + 1)); ?>">Próxima →</a>
+                        <?php endif; ?>
+                    </nav>
+                <?php endif; ?>
+            <?php endif; ?>
+        </main>
     </div>
     <script src="public/js/transitions.js"></script>
 </body>
+
 </html>

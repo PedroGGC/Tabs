@@ -143,7 +143,7 @@
         if (element instanceof HTMLAnchorElement) {
             try {
                 const url = new URL(element.href, window.location.href);
-                const isFromEditPage = /post-edit\.php$/i.test(window.location.pathname);
+                const isFromEditPage = /posts\.php/i.test(window.location.pathname) && /[?&]action=edit/i.test(window.location.search);
                 const isToDashboard = /dashboard\.php$/i.test(url.pathname);
                 if (isFromEditPage && isToDashboard) {
                     return 'down';
@@ -244,12 +244,12 @@
         });
     }, true);
 
-    window.addEventListener('pageshow', function(e) {
-        document.body.classList.remove('page-leaving', 'page-leaving-right', 'page-leaving-up', 'page-leaving-down');
-        document.body.style.opacity = '';
-        document.body.style.transform = '';
-        document.body.classList.remove('page-enter-from-right', 'page-enter-from-left', 'page-enter-from-bottom', 'page-enter-from-top', 'page-enter-none');
-        document.body.style.opacity = '1';
-        document.body.style.transform = '';
+    window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        document.documentElement.classList.remove.apply(document.documentElement.classList, ENTER_CLASSES);
+        body.classList.remove('page-leaving', 'page-leaving-right', 'page-leaving-up', 'page-leaving-down');
+        body.classList.remove.apply(body.classList, ENTER_CLASSES);
+        body.style.opacity = '1';
+        body.style.transform = '';
     });
 })();
