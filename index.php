@@ -26,6 +26,7 @@ if ($currentPage > $totalPages) {
 }
 
 $offset = ($currentPage - 1) * $postsPerPage;
+$currentUserId = currentUserId();
 
 $stmt = $pdo->prepare(
     'SELECT
@@ -36,14 +37,19 @@ $stmt = $pdo->prepare(
         posts.created_at,
         users.id AS author_id,
         users.username AS author,
-        users.avatar AS author_avatar
+        users.avatar AS author_avatar,
+        COALESCE(SUM(post_votes.vote), 0) AS score,
+        MAX(CASE WHEN post_votes.user_id = :current_user_id THEN post_votes.vote ELSE 0 END) AS userVote
      FROM posts
      INNER JOIN users ON users.id = posts.user_id
+     LEFT JOIN post_votes ON post_votes.post_id = posts.id
+     GROUP BY posts.id
      ORDER BY posts.created_at DESC
      LIMIT :limit OFFSET :offset'
 );
 $stmt->bindValue(':limit', $postsPerPage, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':current_user_id', $currentUserId ?? 0, PDO::PARAM_INT);
 $stmt->execute();
 $posts = $stmt->fetchAll();
 
@@ -65,23 +71,7 @@ $hasNextPage = $currentPage < $totalPages;
 
 <body>
     <div id="page">
-        <header class="site-header">
-            <div class="container nav">
-                <a class="brand" href="index.php">Tabs</a>
-                <nav>
-                    <?= themeToggle(); ?>
-                    <?php if (isLogged()): ?>
-                        <?php if (isset($_SESSION['user_id'])): ?>
-                            <a href="user.php?id=<?= (int) $_SESSION['user_id']; ?>" data-transition="up">Meu Perfil</a>
-                        <?php endif; ?>
-                        <a href="logout.php" data-transition="back">Sair</a>
-                    <?php else: ?>
-                        <a href="login.php">Login</a>
-                        <a href="register.php">Cadastro</a>
-                    <?php endif; ?>
-                </nav>
-            </div>
-        </header>
+        <?= siteHeader(); ?>
 
         <main class="container page-shell">
             <?php if ($flash): ?>
@@ -96,36 +86,64 @@ $hasNextPage = $currentPage < $totalPages;
                     <p class="hero-subtitle">Leituras rápidas, ideias e atualizações publicadas pelos autores da
                         plataforma.</p>
                 </div>
-                <?php if (isLogged()): ?>
-                    <a class="button-inline" href="posts.php?action=create" data-transition="up">Criar</a>
-                <?php endif; ?>
-            </section>
-
-            <?php if ($posts === []): ?>
+            </section> <?php if ($posts === []): ?>
                 <p class="empty">Nenhum post publicado ainda.</p>
             <?php else: ?>
-                <?php foreach ($posts as $post): ?>
-                    <article class="card post-card post-card-clickable">
-                        <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>"
-                            aria-label="Abrir post <?= e((string) $post['title']); ?>"></a>
-                        <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>" data-transition="up">
-                            <?php if (!empty($post['author_avatar'])): ?>
-                                <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>"
-                                    alt="Avatar de <?= e($post['author']); ?>">
-                            <?php else: ?>
-                                <span
-                                    class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
+                <div class="posts-grid">
+                    <?php foreach ($posts as $post): ?>
+                        <article class="card post-card post-card-clickable">
+                            <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>" aria-label="Abrir post 
+                    <?= e((string) $post['title']); ?>">
+                            </a>
+                            <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>" data-transition="up">
+                                <?php if (!empty($post['author_avatar'])): ?>
+                                    <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>" alt="Avatar de
+                    <?= e($post['author']); ?>">
+                                <?php else: ?>
+                                    <span
+                                        class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
+                                <?php endif; ?>
+                                <span class="author-link-name">
+                                    <?= e($post['author']); ?>
+                                </span>
+                            </a>
+                            <h2><?= e($post['title']); ?></h2>
+                            <?php if (!empty($post['cover_image'])): ?>
+                                <div class="post-cover-wrap">
+                                    <img class="cover-blur" aria-hidden="true" src="<?= e((string) $post['cover_image']); ?>"
+                                        alt="">
+                                    <img class="post-cover cover-main" src="<?= e((string) $post['cover_image']); ?>"
+                                        alt="Imagem de capa de <?= e($post['title']); ?>">
+                                </div>
                             <?php endif; ?>
-                            <span class="author-link-name"><?= e($post['author']); ?></span>
-                        </a>
-                        <h2><?= e($post['title']); ?></h2>
-                        <?php if (!empty($post['cover_image'])): ?>
-                            <img class="post-cover" src="<?= e((string) $post['cover_image']); ?>"
-                                alt="Imagem de capa de <?= e($post['title']); ?>">
-                        <?php endif; ?>
-                        <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
-                    </article>
-                <?php endforeach; ?>
+                            <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
+
+                            <!-- VOTES -->
+                            <div class="vote-group" data-post-id="<?= (int) $post['id']; ?>" style="margin-top: 1rem;">
+                                <button type="button"
+                                    class="action-btn vote-btn <?= (int) $post['userVote'] === 1 ? 'active-up' : '' ?>"
+                                    data-vote="1" aria-label="Upvote">
+                                    <svg width=" 20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 11V19h6v-8h4l-7-7-7 7h4z" />
+                                    </svg>
+                                </button>
+                                <span class="vote-count"
+                                    style="font-weight: 700; font-size: 0.95rem; min-width: 2ch; text-align: center; color: var(--color-text); margin: 0 4px;">
+                                    <?= (int) $post['score']; ?>
+                                </span>
+                                <button type="button"
+                                    class="action-btn vote-btn <?= (int) $post['userVote'] === -1 ? 'active-down' : '' ?>"
+                                    data-vote="-1" aria-label="Downvote">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M15 13V5H9v8H5l7 7 7-7h-4z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
 
                 <?php if ($hasPreviousPage || $hasNextPage): ?>
                     <nav class="pagination" aria-label="Paginação">
@@ -135,12 +153,12 @@ $hasNextPage = $currentPage < $totalPages;
                         <?php if ($hasNextPage): ?>
                             <a class="pagination-link" href="<?= e($buildPageUrl($currentPage + 1)); ?>">Próxima →</a>
                         <?php endif; ?>
-                    </nav>
-                <?php endif; ?>
+                    </nav> <?php endif; ?>
             <?php endif; ?>
         </main>
     </div>
-    <script src="public/js/transitions.js"></script>
+    <?= pageScripts(); ?>
+    <script src="public/js/votes.js" defer></script>
 </body>
 
 </html>

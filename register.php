@@ -41,16 +41,7 @@ if (isPostRequest()) {
 
 <body>
     <div id="page">
-        <header class="site-header">
-            <div class="container nav">
-                <a class="brand" href="index.php">Tabs</a>
-                <nav>
-                    <?= themeToggle(); ?>
-                    <a href="login.php">Login</a>
-                    <a href="register.php">Cadastro</a>
-                </nav>
-            </div>
-        </header>
+        <?= siteHeader(); ?>
 
         <main class="container page-shell">
             <section class="card form-card auth-card">
@@ -99,7 +90,7 @@ if (isPostRequest()) {
             </section>
         </main>
     </div>
-    <script src="public/js/transitions.js"></script>
+    <?= pageScripts(); ?>
     <script>
         document.querySelectorAll('.password-toggle').forEach(function (btn) {
             btn.addEventListener('click', function () {
