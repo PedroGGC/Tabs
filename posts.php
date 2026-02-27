@@ -25,7 +25,7 @@ $action = match ($actionParam) {
 };
 
 if ($action === null) {
-    redirect('dashboard.php');
+    redirect('user.php?id=' . $userId);
 }
 
 $errors = [];
@@ -45,20 +45,20 @@ if ($action === 'create') {
 
         if ($result['success']) {
             setFlash('success', 'Post criado com sucesso.');
-            redirect('dashboard.php');
+            redirect('user.php?id=' . $userId);
         }
     }
 } elseif ($action === 'edit') {
     $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
     if ($postId === false || $postId === null) {
         setFlash('error', 'Post inválido.');
-        redirect('dashboard.php');
+        redirect('user.php?id=' . $userId);
     }
 
     $post = postFindOwned($pdo, $postId, $userId);
     if ($post === null) {
         setFlash('error', 'Post não encontrado ou sem permissão para editar.');
-        redirect('dashboard.php');
+        redirect('user.php?id=' . $userId);
     }
 
     $old = [
@@ -75,12 +75,12 @@ if ($action === 'create') {
 
         if ($result['success']) {
             setFlash('success', 'Post atualizado com sucesso.');
-            redirect('dashboard.php');
+            redirect('user.php?id=' . $userId);
         }
 
         if ($post === null) {
             setFlash('error', 'Post não encontrado ou sem permissão para editar.');
-            redirect('dashboard.php');
+            redirect('user.php?id=' . $userId);
         }
     }
 } else {
@@ -91,13 +91,13 @@ if ($action === 'create') {
 
     if ($postId === false || $postId === null) {
         setFlash('error', 'Post inválido.');
-        redirect('dashboard.php');
+        redirect('user.php?id=' . $userId);
     }
 
     $post = postFindOwned($pdo, $postId, $userId);
     if ($post === null) {
         setFlash('error', 'Post não encontrado ou sem permissão para excluir.');
-        redirect('dashboard.php');
+        redirect('user.php?id=' . $userId);
     }
 
     if (isPostRequest()) {
@@ -114,7 +114,7 @@ if ($action === 'create') {
             setFlash('error', 'Exclusão cancelada.');
         }
 
-        redirect('dashboard.php');
+        redirect('user.php?id=' . $userId);
     }
 }
 
@@ -138,7 +138,7 @@ $title = match ($action) {
                 <a class="brand" href="index.php">Tabs</a>
                 <nav>
                     <?= themeToggle(); ?>
-                    <a href="dashboard.php">Dashboard</a>
+                    <a href="user.php?id=<?= $userId; ?>" data-transition="up">Meu Perfil</a>
                     <?php if ($action === 'delete'): ?>
                         <a href="posts.php?action=create">Criar</a>
                     <?php endif; ?>

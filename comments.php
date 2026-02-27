@@ -16,7 +16,7 @@ $action = match ($actionParam) {
 };
 
 if ($action === null || !isPostRequest()) {
-    redirect('dashboard.php');
+    redirect('index.php');
 }
 
 verifyCsrfOrFail();

@@ -24,7 +24,8 @@
     toggleButtons.forEach(function (btn) {
       btn.addEventListener("click", function () {
         var current = html.getAttribute("data-theme") || "light";
-        apply(current === "dark" ? "light" : "dark");
+        var nextTheme = current === "dark" ? "light" : "dark";
+        apply(nextTheme);
       });
     });
   });

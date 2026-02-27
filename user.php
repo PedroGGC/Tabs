@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/layout.php';
 
 $pdo = getPDO();
 $userId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -83,21 +84,18 @@ $isOwnProfile = $profileUser && isLogged() && currentUserId() === (int) $profile
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $profileUser ? e((string) $profileUser['username']) : 'Usuário não encontrado'; ?></title>
-    <link rel="stylesheet" href="public/css/style.css">
+    <?= headTags($profileUser ? e((string) $profileUser['username']) . ' | Tabs' : 'Usuário não encontrado | Tabs'); ?>
 </head>
 
 <body>
     <div id="page">
         <header class="site-header">
             <div class="container nav">
-                <a class="brand" href="index.php">Blog PHP</a>
+                <a class="brand" href="index.php">Tabs</a>
                 <nav>
+                    <?= themeToggle(); ?>
                     <?php if (isLogged()): ?>
-                        <span class="nav-user">Olá, <?= e((string) ($_SESSION['username'] ?? '')); ?></span>
-                        <a href="dashboard.php">Dashboard</a>
+                        <a href="user.php?id=<?= $profileUser['id']; ?>">Meu Perfil</a>
                         <a href="logout.php" data-transition="back">Sair</a>
                     <?php else: ?>
                         <a href="login.php">Login</a>
@@ -144,6 +142,94 @@ $isOwnProfile = $profileUser && isLogged() && currentUserId() === (int) $profile
                         </section>
                     <?php endif; ?>
                 </section>
+
+                <?php if ($isOwnProfile): ?>
+                    <section class="card" style="margin-top: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h2>Meus Posts</h2>
+                            <a class="button-inline" href="posts.php?action=create" data-transition="up">Criar Novo Post</a>
+                        </div>
+
+                        <?php if ($posts === []): ?>
+                            <p class="empty">Você ainda não publicou posts.</p>
+                        <?php else: ?>
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Criado em</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($posts as $myPost): ?>
+                                            <tr>
+                                                <td>
+                                                    <a
+                                                        href="post.php?id=<?= (int) $myPost['id']; ?>"><?= e((string) $myPost['title']); ?></a>
+                                                </td>
+                                                <td><?= e(formatDate((string) $myPost['created_at'])); ?></td>
+                                                <td>
+                                                    <div class="actions-row">
+                                                        <a class="action-link"
+                                                            href="posts.php?action=edit&id=<?= (int) $myPost['id']; ?>"
+                                                            data-transition="up">Editar</a>
+                                                        <button class="action-link danger-link" type="button"
+                                                            onclick="openDeleteModal(<?= (int) $myPost['id']; ?>)">Excluir</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+
+                    <div id="deleteModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="deleteModalTitle">
+                        <div class="modal-content card">
+                            <h2 id="deleteModalTitle">Confirmar Exclusão</h2>
+                            <p>Tem certeza que deseja excluir o post que selecionou? Esta ação não pode ser desfeita.</p>
+                            <form method="post" action="posts.php?action=delete">
+                                <?= csrfInput(); ?>
+                                <input type="hidden" name="post_id" id="deletePostId" value="">
+                                <input type="hidden" name="confirm" value="yes">
+                                <div class="actions-row" style="margin-top: 1.5rem; justify-content: flex-end;">
+                                    <button type="button" class="button-outline" onclick="closeDeleteModal()">Cancelar</button>
+                                    <button type="submit" class="button-danger">Excluir Post</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <script>
+                        function openDeleteModal(postId) {
+                            document.getElementById('deletePostId').value = postId;
+                            const modal = document.getElementById('deleteModal');
+                            modal.classList.add('modal-visible');
+                            modal.setAttribute('aria-hidden', 'false');
+                        }
+
+                        function closeDeleteModal() {
+                            const modal = document.getElementById('deleteModal');
+                            modal.classList.remove('modal-visible');
+                            modal.setAttribute('aria-hidden', 'true');
+                            document.getElementById('deletePostId').value = '';
+                        }
+
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const modal = document.getElementById('deleteModal');
+                            if (modal) {
+                                modal.addEventListener('click', function (e) {
+                                    if (e.target === this) {
+                                        closeDeleteModal();
+                                    }
+                                });
+                            }
+                        });
+                    </script>
+                <?php endif; ?>
 
                 <?php if ($posts === []): ?>
                     <p class="empty">Este usuário ainda não publicou posts.</p>

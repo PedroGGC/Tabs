@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/layout.php';
 
 requireLogin();
 
@@ -25,7 +26,7 @@ if (!$user) {
 }
 
 $resolveReturnTo = static function (): string {
-    $allowed = ['profile.php', 'dashboard.php'];
+    $allowed = ['profile.php', 'user.php'];
     $target = sanitize((string) ($_POST['return_to'] ?? 'profile.php'));
     return in_array($target, $allowed, true) ? $target : 'profile.php';
 };
@@ -252,19 +253,17 @@ if (isPostRequest()) {
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Perfil</title>
-    <link rel="stylesheet" href="public/css/style.css">
+    <?= headTags('Meu Perfil | Tabs'); ?>
 </head>
 
 <body>
     <div id="page">
         <header class="site-header">
             <div class="container nav">
-                <a class="brand" href="index.php">Blog PHP</a>
+                <a class="brand" href="index.php">Tabs</a>
                 <nav>
-                    <a href="dashboard.php">Dashboard</a>
+                    <?= themeToggle(); ?>
+                    <a href="user.php?id=<?= $userId; ?>" data-transition="back">Meu Perfil</a>
                     <a href="profile.php">Meu Perfil</a>
                     <a href="logout.php" data-transition="back">Sair</a>
                 </nav>

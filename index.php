@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/layout.php';
 
 $pdo = getPDO();
 $flash = getFlash();
@@ -59,21 +60,20 @@ $hasNextPage = $currentPage < $totalPages;
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Threadly | Início</title>
-    <link rel="stylesheet" href="public/css/style.css">
+    <?= headTags('Tabs | Início'); ?>
 </head>
 
 <body>
     <div id="page">
         <header class="site-header">
             <div class="container nav">
-                <a class="brand" href="index.php">Threadly</a>
+                <a class="brand" href="index.php">Tabs</a>
                 <nav>
+                    <?= themeToggle(); ?>
                     <?php if (isLogged()): ?>
-                        <span class="nav-user">Olá, <?= e((string) ($_SESSION['username'] ?? '')); ?></span>
-                        <a href="dashboard.php">Dashboard</a>
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <a href="user.php?id=<?= (int) $_SESSION['user_id']; ?>" data-transition="up">Meu Perfil</a>
+                        <?php endif; ?>
                         <a href="logout.php" data-transition="back">Sair</a>
                     <?php else: ?>
                         <a href="login.php">Login</a>
@@ -108,7 +108,7 @@ $hasNextPage = $currentPage < $totalPages;
                     <article class="card post-card post-card-clickable">
                         <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>"
                             aria-label="Abrir post <?= e((string) $post['title']); ?>"></a>
-                        <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>">
+                        <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>" data-transition="up">
                             <?php if (!empty($post['author_avatar'])): ?>
                                 <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>"
                                     alt="Avatar de <?= e($post['author']); ?>">
