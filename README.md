@@ -6,6 +6,7 @@
 Tabs is a social blog project built with plain PHP and MySQL, with session-based authentication, posts, profiles, and threaded comments.
 
 ## Technologies
+
 - PHP 8.1+
 - MySQL
 - PDO
@@ -15,6 +16,7 @@ Tabs is a social blog project built with plain PHP and MySQL, with session-based
 - JavaScript (vanilla)
 
 ## Project Structure
+
 ```text
 blog-php/
 ├── config/
@@ -37,33 +39,37 @@ blog-php/
 ├── login.php
 ├── logout.php
 ├── dashboard.php
-├── profile.php
+├── account.php
 ├── user.php
-├── posts.php
 ├── comments.php
-├── notifications-read.php
 └── README.md
 ```
 
 ## Installation
+
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 ```
 
 2. Enter the project folder:
+
 ```bash
 cd blog-php
 ```
 
 3. Create the database and tables by importing the SQL script:
+
 - File: `database/blog.sql`
 - You can use phpMyAdmin, MySQL Workbench, or terminal:
+
 ```bash
 mysql -u root -p < database/blog.sql
 ```
 
 4. Configure your database credentials using environment variables:
+
 - `DB_HOST`
 - `DB_PORT`
 - `DB_NAME`
@@ -72,6 +78,7 @@ mysql -u root -p < database/blog.sql
 - `DB_CHARSET`
 
 Example (PowerShell):
+
 ```powershell
 $env:DB_HOST='localhost'
 $env:DB_PORT='3306'
@@ -84,22 +91,25 @@ $env:DB_CHARSET='utf8mb4'
 You can keep local development without ENV because `config/database.php` has safe local fallbacks.
 
 5. Run the project on a local server (XAMPP/WAMP):
+
 - Place the `blog-php` folder inside `htdocs` (XAMPP) or `www` (WAMP), or configure a virtual host.
 - Open in your browser:
+
 ```text
 http://localhost/blog-php
 ```
 
 ## Usage Flow
+
 1. Open `register.php` to create a user account.
 2. Log in via `login.php`.
 3. Create, edit, and delete your own posts in `dashboard.php`.
 4. View public posts in `index.php` and open details in `post.php?id=X`.
 
 ## Security Notes
+
 - Prepared statements (PDO) in all queries.
 - Escaped output using `htmlspecialchars`.
 - Password hashing with bcrypt.
 - Access control for protected pages.
 - Author ownership validation for editing/deleting posts.
-

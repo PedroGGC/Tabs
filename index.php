@@ -7,7 +7,6 @@ require_once __DIR__ . '/includes/layout.php';
 
 $pdo = getPDO();
 $flash = getFlash();
-// perf: paginated public listing and reduced selected content payload
 $postsPerPage = 6;
 $currentPage = filter_input(
     INPUT_GET,

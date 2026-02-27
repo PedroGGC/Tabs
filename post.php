@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/layout.php';
 $pdo = getPDO();
 $flash = getFlash();
 $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$currentUserId = currentUserId(); // Must be before comment query that uses :viewer_id
+$currentUserId = currentUserId();
 $post = null;
 $comments = [];
 

@@ -6,21 +6,18 @@ require_once __DIR__ . '/includes/auth.php';
 
 header('Content-Type: application/json');
 
-// --- Auth guard (HTTP 401 if not logged in) ---
 if (!isLogged()) {
     http_response_code(401);
     echo json_encode(['error' => 'Você precisa estar logado para votar.']);
     exit;
 }
 
-// --- Only POST accepted ---
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Método não permitido.']);
     exit;
 }
 
-// --- CSRF ---
 $submittedToken = $_POST['_csrf'] ?? '';
 $sessionToken = $_SESSION['_csrf_token'] ?? '';
 if (
@@ -34,8 +31,6 @@ if (
     exit;
 }
 
-// --- Input validation ---
-// --- Input validation ---
 $itemType = filter_input(INPUT_POST, 'item_type', FILTER_SANITIZE_SPECIAL_CHARS);
 $itemId = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
 $voteRaw = filter_input(INPUT_POST, 'vote', FILTER_VALIDATE_INT);
@@ -50,7 +45,6 @@ $vote = (int) $voteRaw;
 $userId = currentUserId();
 $pdo = getPDO();
 
-// Helper to notify owner
 function notifyOwner($pdo, $itemType, $itemId, $userId)
 {
     if ($itemType === 'post') {
@@ -74,7 +68,6 @@ function notifyOwner($pdo, $itemType, $itemId, $userId)
     }
 }
 
-// --- Load current vote for this user on this item ---
 $currentStmt = $pdo->prepare(
     'SELECT vote FROM votes WHERE item_type = :type AND item_id = :iid AND user_id = :uid LIMIT 1'
 );
@@ -82,7 +75,6 @@ $currentStmt->execute(['type' => $itemType, 'iid' => $itemId, 'uid' => $userId])
 $existing = $currentStmt->fetchColumn();
 
 if ($existing === false) {
-    // No vote yet → insert
     $pdo->prepare('INSERT INTO votes (item_type, item_id, user_id, vote) VALUES (:type, :iid, :uid, :vote)')
         ->execute(['type' => $itemType, 'iid' => $itemId, 'uid' => $userId, 'vote' => $vote]);
     $userVote = $vote;
@@ -91,12 +83,10 @@ if ($existing === false) {
         notifyOwner($pdo, $itemType, $itemId, $userId);
     }
 } elseif ((int) $existing === $vote) {
-    // Same vote → toggle off
     $pdo->prepare('DELETE FROM votes WHERE item_type = :type AND item_id = :iid AND user_id = :uid')
         ->execute(['type' => $itemType, 'iid' => $itemId, 'uid' => $userId]);
     $userVote = 0;
 } else {
-    // Different vote → update
     $pdo->prepare('UPDATE votes SET vote = :vote WHERE item_type = :type AND item_id = :iid AND user_id = :uid')
         ->execute(['vote' => $vote, 'type' => $itemType, 'iid' => $itemId, 'uid' => $userId]);
     $userVote = $vote;
@@ -106,7 +96,6 @@ if ($existing === false) {
     }
 }
 
-// --- Return updated score ---
 $scoreStmt = $pdo->prepare(
     'SELECT COALESCE(SUM(vote), 0) AS score FROM votes WHERE item_type = :type AND item_id = :iid'
 );

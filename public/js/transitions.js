@@ -66,6 +66,8 @@
             cleanupEnter();
         };
 
+        document.documentElement.style.visibility = '';
+        
         body.classList.add(enterClass);
         body.addEventListener('animationend', onEnterAnimationEnd);
         window.setTimeout(cleanupEnter, DURATION_MS + 50);
