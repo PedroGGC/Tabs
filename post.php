@@ -58,23 +58,7 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
 
 <body>
     <div id="page">
-        <header class="site-header">
-            <div class="container nav">
-                <a class="brand" href="index.php">Tabs</a>
-                <nav>
-                    <?= themeToggle(); ?>
-                    <?php if (isLogged()): ?>
-                        <?php if ($currentUserId): ?>
-                            <a href="user.php?id=<?= $currentUserId; ?>">Meu Perfil</a>
-                        <?php endif; ?>
-                        <a href="logout.php" data-transition="back">Sair</a>
-                    <?php else: ?>
-                        <a href="login.php">Login</a>
-                        <a href="register.php">Cadastro</a>
-                    <?php endif; ?>
-                </nav>
-            </div>
-        </header>
+<?= siteHeader(); ?>
 
         <main class="container page-shell">
             <?php if ($flash): ?>
@@ -106,8 +90,11 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
                         <p class="meta">em <?= e(formatDate((string) $post['created_at'])); ?></p>
                     </div>
                     <?php if (!empty($post['cover_image'])): ?>
-                        <img class="post-cover post-cover-full" src="<?= e((string) $post['cover_image']); ?>"
-                            alt="Imagem de capa de <?= e((string) $post['title']); ?>">
+                        <div class="post-cover-wrap">
+                            <img class="cover-blur" aria-hidden="true" src="<?= e((string) $post['cover_image']); ?>" alt="">
+                            <img class="post-cover post-cover-full cover-main" src="<?= e((string) $post['cover_image']); ?>"
+                                alt="Imagem de capa de <?= e((string) $post['title']); ?>">
+                        </div>
                     <?php endif; ?>
                     <div class="post-content"><?= nl2br(e((string) $post['content'])); ?></div>
                     <p class="meta">Última atualização: <?= e(formatDate((string) $post['updated_at'])); ?></p>
@@ -154,129 +141,137 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
                                 $commentAnchor = 'comment-' . (int) $comment['id'];
                                 ?>
                                 <article class="comment-item" id="<?= $commentAnchor; ?>">
-                                    <div class="author-row">
-                                        <a class="author-link" href="user.php?id=<?= (int) $comment['comment_user_id']; ?>"
-                                            data-transition="up">
-                                            <?php if (!empty($comment['comment_author_avatar'])): ?>
-                                                <img class="avatar avatar-sm"
-                                                    src="<?= e((string) $comment['comment_author_avatar']); ?>"
-                                                    alt="Avatar de <?= e((string) $comment['comment_author']); ?>">
-                                            <?php else: ?>
-                                                <span
-                                                    class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $comment['comment_author'])); ?></span>
-                                            <?php endif; ?>
-                                            <span class="author-link-name"><?= e((string) $comment['comment_author']); ?></span>
-                                        </a>
-                                        <?php if ((int) $comment['comment_user_id'] === (int) $post['author_id']): ?>
-                                            <span class="badge badge-op">Autor</span>
+                                    <a class="author-avatar-link" href="user.php?id=<?= (int) $comment['comment_user_id']; ?>"
+                                        data-transition="up">
+                                        <?php if (!empty($comment['comment_author_avatar'])): ?>
+                                            <img class="avatar avatar-sm" src="<?= e((string) $comment['comment_author_avatar']); ?>"
+                                                alt="Avatar de <?= e((string) $comment['comment_author']); ?>">
+                                        <?php else: ?>
+                                            <span
+                                                class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $comment['comment_author'])); ?></span>
                                         <?php endif; ?>
-                                        <p class="meta" style="margin-left:auto;">em
-                                            <?= e(formatDate((string) $comment['created_at'])); ?>
-                                        </p>
-                                    </div>
+                                    </a>
 
-                                    <?php if ($isOwn && isset($_GET['edit_comment']) && (int) $_GET['edit_comment'] === (int) $comment['id']): ?>
-                                        <form method="post" action="comments.php?action=update&id=<?= (int) $comment['id']; ?>"
-                                            class="comment-form">
-                                            <?= csrfInput(); ?>
-                                            <textarea name="content" rows="3" maxlength="1000"
-                                                required><?= e((string) $comment['content']); ?></textarea>
-                                            <div class="actions-row">
-                                                <button type="submit">Salvar</button>
-                                                <a class="secondary button-outline"
-                                                    href="post.php?id=<?= (int) $postId; ?>#<?= $commentAnchor; ?>">Cancelar</a>
-                                            </div>
-                                        </form>
-                                    <?php else: ?>
-                                        <p class="comment-content" id="comment-text-<?= (int) $comment['id']; ?>">
-                                            <?= nl2br(e((string) $comment['content'])); ?></p>
+                                    <div class="comment-body">
+                                        <div class="author-row">
+                                            <a class="author-link" href="user.php?id=<?= (int) $comment['comment_user_id']; ?>"
+                                                data-transition="up">
+                                                <span class="author-link-name"><?= e((string) $comment['comment_author']); ?></span>
+                                            </a>
+                                            <?php if ((int) $comment['comment_user_id'] === (int) $post['author_id']): ?>
+                                                <span class="badge badge-op">Autor</span>
+                                            <?php endif; ?>
+                                            <p class="meta" style="margin-left:auto;">em
+                                                <?= e(formatDate((string) $comment['created_at'])); ?>
+                                            </p>
+                                        </div>
 
-                                        <!-- Inline edit form (hidden by default) -->
-                                        <form method="post" action="comments.php?action=update&id=<?= (int) $comment['id']; ?>"
-                                            class="inline-edit-form" id="edit-form-<?= (int) $comment['id']; ?>" style="display:none;">
-                                            <?= csrfInput(); ?>
-                                            <textarea name="content" rows="3" maxlength="1000"
-                                                required><?= e((string) $comment['content']); ?></textarea>
-                                            <div class="actions-row">
-                                                <button type="submit">Salvar</button>
-                                                <button type="button" class="button-outline edit-cancel-btn"
-                                                    data-comment-id="<?= (int) $comment['id']; ?>">Cancelar</button>
-                                            </div>
-                                        </form>
+                                        <?php if ($isOwn && isset($_GET['edit_comment']) && (int) $_GET['edit_comment'] === (int) $comment['id']): ?>
+                                            <form method="post" action="comments.php?action=update&id=<?= (int) $comment['id']; ?>"
+                                                class="comment-form">
+                                                <?= csrfInput(); ?>
+                                                <textarea name="content" rows="3" maxlength="1000"
+                                                    required><?= e((string) $comment['content']); ?></textarea>
+                                                <div class="actions-row">
+                                                    <button type="submit">Salvar</button>
+                                                    <a class="secondary button-outline"
+                                                        href="post.php?id=<?= (int) $postId; ?>#<?= $commentAnchor; ?>">Cancelar</a>
+                                                </div>
+                                            </form>
+                                        <?php else: ?>
+<p class="comment-content" id="comment-text-<?= (int) $comment['id']; ?>"><?= nl2br(trim(e((string) $comment['content']))); ?></p>
+                                          <!-- Inline edit form (hidden by default) -->
+                                            <form method="post" action="comments.php?action=update&id=<?= (int) $comment['id']; ?>"
+                                                class="inline-edit-form" id="edit-form-<?= (int) $comment['id']; ?>"
+                                                style="display:none;">
+                                                <?= csrfInput(); ?>
+                                                <textarea name="content" rows="3" maxlength="1000"
+                                                    required><?= e((string) $comment['content']); ?></textarea>
+                                                <div class="actions-row">
+                                                    <button type="submit">Salvar</button>
+                                                    <button type="button" class="button-outline edit-cancel-btn"
+                                                        data-comment-id="<?= (int) $comment['id']; ?>">Cancelar</button>
+                                                </div>
+                                            </form>
 
-                                        <div class="comment-actions">
-                                            <div class="vote-group" style="display:flex; align-items:center;">
-                                                <button type="button" class="action-btn upvote-btn" aria-label="Upvote">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor"
-                                                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M9 11V19h6v-8h4l-7-7-7 7h4z" />
-                                                    </svg>
-                                                </button>
-                                                <span class="vote-count"
-                                                    style="font-weight:700; font-size:0.85rem; color:var(--muted); margin: 0 2px;">0</span>
-                                                <button type="button" class="action-btn downvote-btn" aria-label="Downvote">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor"
-                                                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M15 13V5H9v8H5l7 7 7-7h-4z" />
-                                                    </svg>
-                                                </button>
-                                            </div>
+                                            <div class="comment-actions">
+                                                <div class="vote-group" style="display:flex; align-items:center;">
+                                                    <button type="button" class="action-btn upvote-btn" aria-label="Upvote">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor"
+                                                            stroke-width="1.5" fill="none" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <path d="M9 11V19h6v-8h4l-7-7-7 7h4z" />
+                                                        </svg>
+                                                    </button>
+                                                    <span class="vote-count"
+                                                        style="font-weight:700; font-size:0.85rem; color:var(--muted); margin: 0 2px;">0</span>
+                                                    <button type="button" class="action-btn downvote-btn" aria-label="Downvote">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor"
+                                                            stroke-width="1.5" fill="none" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <path d="M15 13V5H9v8H5l7 7 7-7h-4z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
 
-                                            <?php if (isLogged()): ?>
-                                                <button type="button" class="action-btn reply-toggle-btn"
-                                                    data-target="reply-form-<?= (int) $comment['id'] ?>">
+                                                <?php if (isLogged()): ?>
+                                                    <button type="button" class="action-btn reply-toggle-btn"
+                                                        data-target="reply-form-<?= (int) $comment['id'] ?>">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                                        </svg>
+                                                        Reply
+                                                    </button>
+                                                <?php endif; ?>
+
+                                                <button type="button" class="action-btn award-btn">
                                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                                        <circle cx="12" cy="8" r="7" />
+                                                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
                                                     </svg>
-                                                    Reply
+                                                    Award
                                                 </button>
-                                            <?php endif; ?>
 
-                                            <button type="button" class="action-btn award-btn">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <circle cx="12" cy="8" r="7" />
-                                                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                                                </svg>
-                                                Award
-                                            </button>
+                                                <button type="button" class="action-btn share-btn"
+                                                    data-link="<?= (int) $comment['id'] ?>">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <polyline points="15 14 20 9 15 4" />
+                                                        <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
+                                                    </svg>
+                                                    Share
+                                                </button>
 
-                                            <button type="button" class="action-btn share-btn" data-link="<?= (int) $comment['id'] ?>">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <polyline points="15 14 20 9 15 4" />
-                                                    <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
-                                                </svg>
-                                                Share
-                                            </button>
-
-                                            <?php if ($isOwn): ?>
-                                                <button type="button" class="action-btn edit-comment-btn"
-                                                    data-comment-id="<?= (int) $comment['id']; ?>" style="margin-left:auto;">Editar</button>
-                                                <button type="button" class="action-btn danger-label" style="color:var(--danger);"
-                                                    onclick="openCommentDeleteModal(<?= (int) $comment['id']; ?>)">Excluir</button>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <?php if (isLogged()): ?>
-                                        <form method="post" action="comments.php?action=store" class="comment-form reply-form"
-                                            id="reply-form-<?= (int) $comment['id'] ?>" style="display:none; margin-top: 10px;">
-                                            <?= csrfInput(); ?>
-                                            <input type="hidden" name="post_id" value="<?= (int) $postId; ?>">
-                                            <input type="hidden" name="parent_id" value="<?= (int) $comment['id']; ?>">
-                                            <label for="reply-input-<?= (int) $comment['id']; ?>" class="meta">Responder a
-                                                <?= e((string) $comment['comment_author']); ?></label>
-                                            <textarea id="reply-input-<?= (int) $comment['id']; ?>" name="content" rows="2"
-                                                maxlength="1000" required></textarea>
-                                            <div class="actions-row">
-                                                <button type="button" class="button-outline reply-cancel-btn"
-                                                    data-target="reply-form-<?= (int) $comment['id'] ?>">Cancelar</button>
-                                                <button type="submit">Responder</button>
+                                                <?php if ($isOwn): ?>
+                                                    <button type="button" class="action-btn edit-comment-btn"
+                                                        data-comment-id="<?= (int) $comment['id']; ?>"
+                                                        style="margin-left:auto;">Editar</button>
+                                                    <button type="button" class="action-btn danger-label" style="color:var(--danger);"
+                                                        onclick="openCommentDeleteModal(<?= (int) $comment['id']; ?>)">Excluir</button>
+                                                <?php endif; ?>
                                             </div>
-                                        </form>
-                                    <?php endif; ?>
+                                        <?php endif; ?>
+
+                                        <?php if (isLogged()): ?>
+                                            <form method="post" action="comments.php?action=store" class="comment-form reply-form"
+                                                id="reply-form-<?= (int) $comment['id'] ?>" style="display:none; margin-top: 10px;">
+                                                <?= csrfInput(); ?>
+                                                <input type="hidden" name="post_id" value="<?= (int) $postId; ?>">
+                                                <input type="hidden" name="parent_id" value="<?= (int) $comment['id']; ?>">
+                                                <label for="reply-input-<?= (int) $comment['id']; ?>" class="meta">Responder a
+                                                    <?= e((string) $comment['comment_author']); ?></label>
+                                                <textarea id="reply-input-<?= (int) $comment['id']; ?>" name="content" rows="2"
+                                                    maxlength="1000" required></textarea>
+                                                <div class="actions-row">
+                                                    <button type="button" class="button-outline reply-cancel-btn"
+                                                        data-target="reply-form-<?= (int) $comment['id'] ?>">Cancelar</button>
+                                                    <button type="submit">Responder</button>
+                                                </div>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                 </article>
                             <?php endforeach; ?>
                         </div>
@@ -310,7 +305,7 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
     </div>
     <?= pageScripts(); ?>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        (function () {
             // Fake input toggle
             const fakeInput = document.getElementById('fake-comment-input');
             const realForm = document.getElementById('real-comment-form');
@@ -356,20 +351,40 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
             });
 
             // Simulated upvotes/downvotes
-            document.querySelectorAll('.upvote-btn, .downvote-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const isUpvote = e.currentTarget.classList.contains('upvote-btn');
-                    const sibling = isUpvote ? e.currentTarget.nextElementSibling : e.currentTarget.previousElementSibling;
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.upvote-btn, .downvote-btn');
+                if (!btn) return;
+                
+                const isUpvote = btn.classList.contains('upvote-btn');
+                const group = btn.closest('.vote-group');
+                if (!group) return;
+                
+                const upBtn = group.querySelector('.upvote-btn');
+                const downBtn = group.querySelector('.downvote-btn');
+                const countSpan = group.querySelector('.vote-count');
+                const sibling = isUpvote ? downBtn : upBtn;
+                
+                let count = parseInt(countSpan.textContent) || 0;
 
-                    if (e.currentTarget.classList.contains('active')) {
-                        e.currentTarget.classList.remove('active');
-                    } else {
-                        e.currentTarget.classList.add('active');
+                if (btn.classList.contains('active')) {
+                    // Undo vote
+                    btn.classList.remove('active');
+                    count += isUpvote ? -1 : 1;
+                } else {
+                    // Apply vote
+                    btn.classList.add('active');
+                    count += isUpvote ? 1 : -1;
+                    
+                    // If sibling was active, that means we swapped a vote, so offset by 2
+                    if (sibling && sibling.classList.contains('active')) {
                         sibling.classList.remove('active');
+                        count += isUpvote ? 1 : -1;
                     }
-                    // Em um cenário real, aqui seria acionado um fetch() para salvar no BD.
-                    // Adicionei apenas a lógica visual conforme plano de implementação (UI fallback).
-                });
+                }
+                
+                countSpan.textContent = count;
+                // Em um cenário real, aqui seria acionado um fetch() para salvar no BD.
+                // Atualizado para usar delegação de eventos.
             });
 
             // Share functionality
@@ -436,7 +451,7 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
                     }
                 });
             });
-        });
+        })();
 
         // Comment delete modal
         function openCommentDeleteModal(commentId) {

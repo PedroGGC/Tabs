@@ -45,15 +45,4 @@ $result = match ($action) {
     'delete' => commentDelete($pdo, $currentUserId, $payload),
 };
 
-if ($result['success']) {
-    $successMessage = match ($action) {
-        'store' => 'Comentário publicado com sucesso.',
-        'update' => 'Comentário atualizado com sucesso.',
-        'delete' => 'Comentário excluído com sucesso.',
-    };
-    setFlash('success', $successMessage);
-} else {
-    setFlash('error', $result['errors'][0] ?? 'Não foi possível concluir a ação no comentário.');
-}
-
 redirect($result['redirect'] . $result['anchor']);
