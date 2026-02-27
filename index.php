@@ -38,11 +38,11 @@ $stmt = $pdo->prepare(
         users.id AS author_id,
         users.username AS author,
         users.avatar AS author_avatar,
-        COALESCE(SUM(post_votes.vote), 0) AS score,
-        MAX(CASE WHEN post_votes.user_id = :current_user_id THEN post_votes.vote ELSE 0 END) AS userVote
+        COALESCE(SUM(v.vote), 0) AS score,
+        MAX(CASE WHEN v.user_id = :current_user_id THEN v.vote ELSE 0 END) AS userVote
      FROM posts
      INNER JOIN users ON users.id = posts.user_id
-     LEFT JOIN post_votes ON post_votes.post_id = posts.id
+     LEFT JOIN votes v ON v.item_type = \'post\' AND v.item_id = posts.id
      GROUP BY posts.id
      ORDER BY posts.created_at DESC
      LIMIT :limit OFFSET :offset'
@@ -119,7 +119,8 @@ $hasNextPage = $currentPage < $totalPages;
                             <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
 
                             <!-- VOTES -->
-                            <div class="vote-group" data-post-id="<?= (int) $post['id']; ?>" style="margin-top: 1rem;">
+                            <div class="vote-group" data-item-type="post" data-item-id="<?= (int) $post['id']; ?>"
+                                style="margin-top: 1rem;">
                                 <button type="button"
                                     class="action-btn vote-btn <?= (int) $post['userVote'] === 1 ? 'active-up' : '' ?>"
                                     data-vote="1" aria-label="Upvote">

@@ -89,21 +89,7 @@ $isOwnProfile = $profileUser && isLogged() && currentUserId() === (int) $profile
 
 <body>
     <div id="page">
-        <header class="site-header">
-            <div class="container nav">
-                <a class="brand" href="index.php">Tabs</a>
-                <nav>
-                    <?= themeToggle(); ?>
-                    <?php if (isLogged()): ?>
-                        <a href="user.php?id=<?= $profileUser['id']; ?>">Meu Perfil</a>
-                        <a href="logout.php" data-transition="back">Sair</a>
-                    <?php else: ?>
-                        <a href="login.php">Login</a>
-                        <a href="register.php">Cadastro</a>
-                    <?php endif; ?>
-                </nav>
-            </div>
-        </header>
+        <?= siteHeader(); ?>
 
         <main class="container page-shell">
             <?php if (!$profileUser): ?>
@@ -147,7 +133,6 @@ $isOwnProfile = $profileUser && isLogged() && currentUserId() === (int) $profile
                     <section class="card" style="margin-top: 1.5rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <h2>Meus Posts</h2>
-                            <a class="button-inline" href="posts.php?action=create" data-transition="up">Criar Novo Post</a>
                         </div>
 
                         <?php if ($posts === []): ?>
@@ -234,28 +219,34 @@ $isOwnProfile = $profileUser && isLogged() && currentUserId() === (int) $profile
                 <?php if ($posts === []): ?>
                     <p class="empty">Este usuário ainda não publicou posts.</p>
                 <?php else: ?>
-                    <?php foreach ($posts as $post): ?>
-                        <article class="card post-card post-card-clickable">
-                            <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>"
-                                aria-label="Abrir post <?= e((string) $post['title']); ?>"></a>
-                            <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>">
-                                <?php if (!empty($post['author_avatar'])): ?>
-                                    <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>"
-                                        alt="Avatar de <?= e($post['author']); ?>">
-                                <?php else: ?>
-                                    <span
-                                        class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
+                    <div class="posts-grid">
+                        <?php foreach ($posts as $post): ?>
+                            <article class="card post-card post-card-clickable">
+                                <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>"
+                                    aria-label="Abrir post <?= e((string) $post['title']); ?>"></a>
+                                <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>">
+                                    <?php if (!empty($post['author_avatar'])): ?>
+                                        <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>"
+                                            alt="Avatar de <?= e($post['author']); ?>">
+                                    <?php else: ?>
+                                        <span
+                                            class="avatar avatar-sm avatar-fallback"><?= e(usernameInitial((string) $post['author'])); ?></span>
+                                    <?php endif; ?>
+                                    <span class="author-link-name"><?= e($post['author']); ?></span>
+                                </a>
+                                <h2><?= e($post['title']); ?></h2>
+                                <?php if (!empty($post['cover_image'])): ?>
+                                    <div class="post-cover-wrap post-cover-wrap-sm">
+                                        <img class="cover-blur" aria-hidden="true" src="<?= e((string) $post['cover_image']); ?>"
+                                            alt="">
+                                        <img class="post-cover cover-main" src="<?= e((string) $post['cover_image']); ?>"
+                                            alt="Imagem de capa de <?= e($post['title']); ?>">
+                                    </div>
                                 <?php endif; ?>
-                                <span class="author-link-name"><?= e($post['author']); ?></span>
-                            </a>
-                            <h2><?= e($post['title']); ?></h2>
-                            <?php if (!empty($post['cover_image'])): ?>
-                                <img class="post-cover" src="<?= e((string) $post['cover_image']); ?>"
-                                    alt="Imagem de capa de <?= e($post['title']); ?>">
-                            <?php endif; ?>
-                            <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
-                        </article>
-                    <?php endforeach; ?>
+                                <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
 
                     <?php if ($hasPreviousPage || $hasNextPage): ?>
                         <nav class="pagination" aria-label="Paginação">
@@ -271,7 +262,7 @@ $isOwnProfile = $profileUser && isLogged() && currentUserId() === (int) $profile
             <?php endif; ?>
         </main>
     </div>
-    <script src="public/js/transitions.js"></script>
+    <?= pageScripts(); ?>
 </body>
 
 </html>

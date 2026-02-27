@@ -12,7 +12,7 @@ $pdo = getPDO();
 $userId = currentUserId();
 
 if ($userId === null) {
-    setFlash('error', 'Usuário inválido.');
+    setFlash('error', 'Usuario invalido.');
     redirect('login.php');
 }
 
@@ -51,13 +51,13 @@ if ($action === 'create') {
 } elseif ($action === 'edit') {
     $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
     if ($postId === false || $postId === null) {
-        setFlash('error', 'Post inválido.');
+        setFlash('error', 'Post invalido.');
         redirect('user.php?id=' . $userId);
     }
 
     $post = postFindOwned($pdo, $postId, $userId);
     if ($post === null) {
-        setFlash('error', 'Post não encontrado ou sem permissão para editar.');
+        setFlash('error', 'Post nao encontrado ou sem permissao para editar.');
         redirect('user.php?id=' . $userId);
     }
 
@@ -79,7 +79,7 @@ if ($action === 'create') {
         }
 
         if ($post === null) {
-            setFlash('error', 'Post não encontrado ou sem permissão para editar.');
+            setFlash('error', 'Post nao encontrado ou sem permissao para editar.');
             redirect('user.php?id=' . $userId);
         }
     }
@@ -90,13 +90,13 @@ if ($action === 'create') {
     }
 
     if ($postId === false || $postId === null) {
-        setFlash('error', 'Post inválido.');
+        setFlash('error', 'Post invalido.');
         redirect('user.php?id=' . $userId);
     }
 
     $post = postFindOwned($pdo, $postId, $userId);
     if ($post === null) {
-        setFlash('error', 'Post não encontrado ou sem permissão para excluir.');
+        setFlash('error', 'Post nao encontrado ou sem permissao para excluir.');
         redirect('user.php?id=' . $userId);
     }
 
@@ -105,13 +105,13 @@ if ($action === 'create') {
         $confirm = (string) ($_POST['confirm'] ?? 'no');
 
         if ($confirm === 'yes') {
-            if (postDelete($pdo, $postId, $userId)) {
-                setFlash('success', 'Post excluído com sucesso.');
+            if (postDelete($pdo, (int) $postId, $userId)) {
+                setFlash('success', 'Post excluido com sucesso.');
             } else {
-                setFlash('error', 'Post não encontrado ou sem permissão para excluir.');
+                setFlash('error', 'Post nao encontrado ou sem permissao para excluir.');
             }
         } else {
-            setFlash('error', 'Exclusão cancelada.');
+            setFlash('error', 'Exclusao cancelada.');
         }
 
         redirect('user.php?id=' . $userId);
@@ -133,25 +133,13 @@ $title = match ($action) {
 
 <body>
     <div id="page">
-        <header class="site-header">
-            <div class="container nav">
-                <a class="brand" href="index.php">Tabs</a>
-                <nav>
-                    <?= themeToggle(); ?>
-                    <a href="user.php?id=<?= $userId; ?>" data-transition="up">Meu Perfil</a>
-                    <?php if ($action === 'delete'): ?>
-                        <a href="posts.php?action=create">Criar</a>
-                    <?php endif; ?>
-                    <a href="logout.php" data-transition="back">Sair</a>
-                </nav>
-            </div>
-        </header>
+        <?= siteHeader(); ?>
 
         <main class="container page-shell">
             <?php if ($action === 'create'): ?>
                 <section class="card form-card">
                     <h1>Criar post</h1>
-                    <p class="meta form-intro">Escreva seu conteúdo e publique para a comunidade.</p>
+                    <p class="meta form-intro">Escreva seu conteudo e publique para a comunidade.</p>
 
                     <?php if ($errors !== []): ?>
                         <div class="alert alert-error">
@@ -164,13 +152,13 @@ $title = match ($action) {
                     <form method="post" action="posts.php?action=create" enctype="multipart/form-data">
                         <?= csrfInput(); ?>
 
-                        <label for="title">Título</label>
+                        <label for="title">Titulo</label>
                         <input type="text" id="title" name="title" value="<?= e($old['title']); ?>" required>
 
-                        <label for="content">Conteúdo</label>
+                        <label for="content">Conteudo</label>
                         <textarea id="content" name="content" rows="10" required><?= e($old['content']); ?></textarea>
 
-                        <label for="cover_image">Imagem de capa (opcional, jpg/jpeg/png/webp até 2MB)</label>
+                        <label for="cover_image">Imagem de capa (opcional, jpg/jpeg/png/webp ate 2MB)</label>
                         <input type="file" id="cover_image" name="cover_image"
                             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
 
@@ -180,7 +168,7 @@ $title = match ($action) {
             <?php elseif ($action === 'edit'): ?>
                 <section class="card form-card">
                     <h1>Editar post</h1>
-                    <p class="meta form-intro">Ajuste seu conteúdo e salve as alterações.</p>
+                    <p class="meta form-intro">Ajuste seu conteudo e salve as alteracoes.</p>
 
                     <?php if ($errors !== []): ?>
                         <div class="alert alert-error">
@@ -194,10 +182,10 @@ $title = match ($action) {
                         enctype="multipart/form-data">
                         <?= csrfInput(); ?>
 
-                        <label for="title">Título</label>
+                        <label for="title">Titulo</label>
                         <input type="text" id="title" name="title" value="<?= e($old['title']); ?>" required>
 
-                        <label for="content">Conteúdo</label>
+                        <label for="content">Conteudo</label>
                         <textarea id="content" name="content" rows="10" required><?= e($old['content']); ?></textarea>
 
                         <?php if ($post !== null && !empty($post['cover_image'])): ?>
@@ -210,16 +198,16 @@ $title = match ($action) {
                             </label>
                         <?php endif; ?>
 
-                        <label for="cover_image">Nova imagem de capa (opcional, jpg/jpeg/png/webp até 2MB)</label>
+                        <label for="cover_image">Nova imagem de capa (opcional, jpg/jpeg/png/webp ate 2MB)</label>
                         <input type="file" id="cover_image" name="cover_image"
                             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
 
-                        <button type="submit">Salvar alterações</button>
+                        <button type="submit">Salvar alteracoes</button>
                     </form>
                 </section>
             <?php else: ?>
                 <section class="card form-card">
-                    <h1>Confirmar exclusão</h1>
+                    <h1>Confirmar exclusao</h1>
                     <p>Tem certeza que deseja excluir o post <strong><?= e((string) $post['title']); ?></strong>?</p>
 
                     <form method="post" action="posts.php?action=delete&id=<?= (int) $postId; ?>" class="actions-row">

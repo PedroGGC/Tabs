@@ -8,6 +8,7 @@ require_once __DIR__ . '/includes/layout.php';
 $pdo = getPDO();
 $flash = getFlash();
 $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$currentUserId = currentUserId(); // Must be before comment query that uses :viewer_id
 $post = null;
 $comments = [];
 
@@ -34,19 +35,27 @@ if (!$post) {
             comments.content,
             comments.created_at,
             comments.parent_id,
-            users.id   AS comment_user_id,
-            users.username AS comment_author,
-            users.avatar   AS comment_author_avatar
+            users.id           AS comment_user_id,
+            users.username     AS comment_author,
+            users.avatar       AS comment_author_avatar,
+            COALESCE(SUM(v.vote), 0)                    AS score,
+            MAX(CASE WHEN v.user_id = :viewer_id THEN v.vote ELSE NULL END) AS userVote
          FROM comments
          INNER JOIN users ON users.id = comments.user_id
+         LEFT JOIN votes v ON v.item_type = \'comment\' AND v.item_id = comments.id
          WHERE comments.post_id = :post_id
+         GROUP BY comments.id, comments.content, comments.created_at, comments.parent_id,
+                  users.id, users.username, users.avatar
          ORDER BY comments.created_at ASC'
     );
-    $commentsStmt->execute(['post_id' => $postId]);
+    $commentsStmt->execute([
+        'post_id'   => $postId,
+        'viewer_id' => $currentUserId ?? 0,
+    ]);
     $comments = $commentsStmt->fetchAll();
 }
 
-$currentUserId = currentUserId();
+
 $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontrado | Tabs';
 ?>
 <!DOCTYPE html>
@@ -195,8 +204,8 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
                                             </form>
 
                                             <div class="comment-actions">
-                                                <div class="vote-group" style="display:flex; align-items:center;">
-                                                    <button type="button" class="action-btn upvote-btn" aria-label="Upvote">
+                                                <div class="vote-group" data-item-type="comment" data-item-id="<?= (int) $comment['id']; ?>" style="display:flex; align-items:center;">
+                                                    <button type="button" class="action-btn<?= ($comment['userVote'] ?? 0) === 1 ? ' active-up' : '' ?>" data-vote="1" aria-label="Upvote">
                                                         <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor"
                                                             stroke-width="1.5" fill="none" stroke-linecap="round"
                                                             stroke-linejoin="round">
@@ -204,8 +213,8 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
                                                         </svg>
                                                     </button>
                                                     <span class="vote-count"
-                                                        style="font-weight:700; font-size:0.85rem; color:var(--muted); margin: 0 2px;">0</span>
-                                                    <button type="button" class="action-btn downvote-btn" aria-label="Downvote">
+                                                        style="font-weight:700; font-size:0.85rem; color:var(--color-text-muted); margin: 0 2px;"><?= (int) ($comment['score'] ?? 0); ?></span>
+                                                    <button type="button" class="action-btn<?= ($comment['userVote'] ?? 0) === -1 ? ' active-down' : '' ?>" data-vote="-1" aria-label="Downvote">
                                                         <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor"
                                                             stroke-width="1.5" fill="none" stroke-linecap="round"
                                                             stroke-linejoin="round">
@@ -350,44 +359,7 @@ $pageTitle = $post ? e((string) $post['title']) . ' | Tabs' : 'Post não encontr
                 });
             });
 
-            // Simulated upvotes/downvotes
-            document.addEventListener('click', (e) => {
-                const btn = e.target.closest('.upvote-btn, .downvote-btn');
-                if (!btn) return;
-                
-                const isUpvote = btn.classList.contains('upvote-btn');
-                const group = btn.closest('.vote-group');
-                if (!group) return;
-                
-                const upBtn = group.querySelector('.upvote-btn');
-                const downBtn = group.querySelector('.downvote-btn');
-                const countSpan = group.querySelector('.vote-count');
-                const sibling = isUpvote ? downBtn : upBtn;
-                
-                let count = parseInt(countSpan.textContent) || 0;
 
-                if (btn.classList.contains('active')) {
-                    // Undo vote
-                    btn.classList.remove('active');
-                    count += isUpvote ? -1 : 1;
-                } else {
-                    // Apply vote
-                    btn.classList.add('active');
-                    count += isUpvote ? 1 : -1;
-                    
-                    // If sibling was active, that means we swapped a vote, so offset by 2
-                    if (sibling && sibling.classList.contains('active')) {
-                        sibling.classList.remove('active');
-                        count += isUpvote ? 1 : -1;
-                    }
-                }
-                
-                countSpan.textContent = count;
-                // Em um cenário real, aqui seria acionado um fetch() para salvar no BD.
-                // Atualizado para usar delegação de eventos.
-            });
-
-            // Share functionality
             const sharePopover = document.getElementById('share-popover');
             const shareInput = document.getElementById('share-link-input');
             const copyBtn = document.getElementById('copy-share-btn');
