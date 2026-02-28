@@ -1,12 +1,15 @@
 {
-    frankenphp
-    order php_server before file_server
-    auto_https off
+  frankenphp
+  order php_server before file_server
+  auto_https off
+  servers {
+    trusted_proxies static 0.0.0.0/0 ::/0
+  }
 }
 
-:{$PORT:80} {
-    root * /app/public
-    encode zstd br gzip
-    php_server
-    file_server
+http://:{$PORT} {
+  root * /app/public
+  encode zstd br gzip
+  php_server
+  file_server
 }
