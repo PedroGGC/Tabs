@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/includes/auth.php';
-require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/auth/auth.php';
+require_once __DIR__ . '/src/core/layout.php';
 
 $pdo = getPDO();
 $flash = getFlash();
@@ -73,30 +73,37 @@ $hasNextPage = $currentPage < $totalPages;
         <?= siteHeader(); ?>
 
         <main class="container page-shell">
+            <div id="hero-particles" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;"></div>
+            
             <?php if ($flash): ?>
                 <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
                     <p><?= e($flash['message']); ?></p>
                 </div>
             <?php endif; ?>
 
-            <section class="card hero">
+            <section class="card hero" style="background: transparent; border: none; box-shadow: none;">
                 <div>
-                    <h1>Posts recentes</h1>
-                    <p class="hero-subtitle">Leituras rápidas, ideias e atualizações publicadas pelos autores da
-                        plataforma.</p>
+                    <div id="hero-title-react">
+                        <h1>Posts recentes</h1>
+                    </div>
+                    <div id="hero-subtitle-react">
+                        <p class="hero-subtitle">Leituras rápidas, ideias e atualizações publicadas pelos autores da plataforma.</p>
+                    </div>
                 </div>
             </section> <?php if ($posts === []): ?>
-                <p class="empty">Nenhum post publicado ainda.</p>
+                <div id="empty-fuzzy">
+                    <p class="empty">Nenhum post publicado ainda.</p>
+                </div>
             <?php else: ?>
                 <div class="posts-grid">
                     <?php foreach ($posts as $post): ?>
                         <article class="card post-card post-card-clickable">
-                            <a class="post-card-link" href="post.php?id=<?= (int) $post['id']; ?>" aria-label="Abrir post 
+                            <a class="post-card-link" href="pages/post_view.php?id=<?= (int) $post['id']; ?>" aria-label="Abrir post 
                     <?= e((string) $post['title']); ?>">
                             </a>
                             <a class="author-link" href="user.php?id=<?= (int) $post['author_id']; ?>" data-transition="up">
                                 <?php if (!empty($post['author_avatar'])): ?>
-                                    <img class="avatar avatar-sm" src="<?= e((string) $post['author_avatar']); ?>" alt="Avatar de
+                                    <img class="avatar avatar-sm" src="<?= e(assetPath((string) $post['author_avatar'])); ?>" alt="Avatar de
                     <?= e($post['author']); ?>">
                                 <?php else: ?>
                                     <span
@@ -106,16 +113,16 @@ $hasNextPage = $currentPage < $totalPages;
                                     <?= e($post['author']); ?>
                                 </span>
                             </a>
-                            <h2><?= e($post['title']); ?></h2>
+                            <h2><?= parsePostContent($post['title']); ?></h2>
                             <?php if (!empty($post['cover_image'])): ?>
                                 <div class="post-cover-wrap">
-                                    <img class="cover-blur" aria-hidden="true" src="<?= e((string) $post['cover_image']); ?>"
+                                    <img class="cover-blur" aria-hidden="true" src="<?= e(assetPath((string) $post['cover_image'])); ?>"
                                         alt="">
-                                    <img class="post-cover cover-main" src="<?= e((string) $post['cover_image']); ?>"
+                                    <img class="post-cover cover-main" src="<?= e(assetPath((string) $post['cover_image'])); ?>"
                                         alt="Imagem de capa de <?= e($post['title']); ?>">
                                 </div>
                             <?php endif; ?>
-                            <p><?= e(excerpt((string) $post['content'], 200)); ?></p>
+                            <p><?= excerpt((string) $post['content'], 200); ?></p>
 
                             <!-- VOTES -->
                             <div class="vote-group" data-item-type="post" data-item-id="<?= (int) $post['id']; ?>"
