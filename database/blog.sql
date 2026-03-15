@@ -38,7 +38,7 @@ CREATE TABLE notifications (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED NOT NULL,
     from_user_id INT UNSIGNED NOT NULL,
-    type ENUM('reply', 'mention', 'upvote') NOT NULL,
+    type ENUM('comment', 'reply', 'mention', 'upvote') NOT NULL,
     comment_id INT UNSIGNED NULL,
     post_id INT UNSIGNED NOT NULL,
     is_read TINYINT(1) NOT NULL DEFAULT 0,
